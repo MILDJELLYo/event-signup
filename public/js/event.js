@@ -10,17 +10,13 @@ fetch(`/api/events/${eventId}`)
 
     container.innerHTML = `
       <h1>${event.title}</h1>
-      <div style="margin-bottom:1rem;">
-        <p><strong>Date:</strong> ${event.date}<br>
-           <strong>Location:</strong> ${event.location}<br>
-           <strong>Hours:</strong> ${event.hours}</p>
-      </div>
 
-      <div style="background:#f3f4f6;padding:1rem;border-radius:8px;margin-bottom:1rem;">
-        <h3>About this Event</h3>
+      <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+        <p><strong>Date:</strong> ${event.date}</p>
+        <p><strong>Location:</strong> ${event.location}</p>
+        <p><strong>Hours:</strong> ${event.hours}</p>
         <p>${event.description}</p>
-        <h3>Contact</h3>
-        <p>${event.contactName} - <a href="mailto:${event.contactEmail}">${event.contactEmail}</a></p>
+        <p><strong>Contact:</strong> ${event.contactName} - <a href="mailto:${event.contactEmail}">${event.contactEmail}</a></p>
       </div>
 
       ${eventFull ? `<div style="background:#dc2626;color:white;padding:10px;border-radius:8px;margin-bottom:1rem;text-align:center;font-weight:600;">
@@ -47,8 +43,7 @@ fetch(`/api/events/${eventId}`)
     `;
 
     if (!eventFull) {
-      const form = document.getElementById('signupForm');
-      form.addEventListener('submit', e => {
+      document.getElementById('signupForm').addEventListener('submit', e => {
         e.preventDefault();
         const name = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
         fetch(`/api/events/${eventId}/signup`, {
@@ -57,7 +52,7 @@ fetch(`/api/events/${eventId}`)
           body: JSON.stringify({ name })
         })
         .then(res => res.json())
-        .then(updatedEvent => location.reload());
+        .then(() => location.reload());
       });
     }
   });
