@@ -1,0 +1,60 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f9fafb;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .container {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  h1, h2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    color: #555;
+  }
+  
+  button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  button.danger {
+    background: #dc2626;
+  }
+  
+  .event-card {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+  }
+  
+  .event-card h2 {
+    margin-top: 0;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  
+  th, td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 8px;
+  }
+  
