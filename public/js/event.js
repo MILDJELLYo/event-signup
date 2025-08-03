@@ -13,6 +13,14 @@ fetch(`/api/events/${eventId}`)
   .then(res => res.json())
   .then(event => {
     const dateStr = new Date(event.date).toLocaleDateString('en-US');
+
+    // Build slot dropdown options for cancel modal
+    let slotOptions = '';
+    event.timeSlots.forEach((slot, index) => {
+      slotOptions += `<option value="${index}">${formatTime(slot.time)} (${slot.hours} Service Hours)</option>`;
+    });
+
+    // Top event info + cancel button
     let html = `
       <h1>${event.title}</h1>
       <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
@@ -21,10 +29,12 @@ fetch(`/api/events/${eventId}`)
         <p><strong>Description:</strong></p>
         <p>${event.description}</p>
         <p><strong>Contact:</strong> ${event.contactName} - <a href="mailto:${event.contactEmail}">${event.contactEmail}</a></p>
+        <button id="openCancelModal" style="background:#dc2626; margin-top:1rem;">Cancel My Signup</button>
       </div>
       <h2>Available Time Slots</h2>
     `;
 
+    // List time slots with signup forms & signup list
     event.timeSlots.forEach((slot, index) => {
       const spotsLeft = slot.maxSpots - slot.signups.length;
       html += `
@@ -44,11 +54,6 @@ fetch(`/api/events/${eventId}`)
               </form>`
               : `<div style="color:red; font-weight:bold;">Full</div>`
           }
-          <form data-slot="${index}" class="cancelForm" style="margin-top:1rem; border-top:1px solid #ccc; padding-top:0.5rem;">
-            <label for="cancelName_${index}">Cancel My Signup</label>
-            <input type="text" id="cancelName_${index}" name="cancelName" placeholder="Enter your name" required>
-            <button type="submit" style="background:#dc2626;">Cancel Signup</button>
-          </form>
           <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
             <thead>
               <tr><th style="text-align:left; border-bottom: 1px solid #ccc;">Signed Up</th></tr>
@@ -92,25 +97,33 @@ fetch(`/api/events/${eventId}`)
       });
     });
 
-    // Cancel form handling
-    document.querySelectorAll('.cancelForm').forEach(form => {
-      form.addEventListener('submit', e => {
-        e.preventDefault();
-        const slotIndex = e.target.dataset.slot;
-        const name = e.target.cancelName.value.trim();
+    // Modal handling for cancel signup
+    const cancelModal = document.getElementById('cancelModal');
+    const closeCancelModal = document.getElementById('closeCancelModal');
+    document.getElementById('openCancelModal').addEventListener('click', () => {
+      document.getElementById('cancelSlot').innerHTML = slotOptions;
+      cancelModal.style.display = 'flex';
+    });
+    closeCancelModal.addEventListener('click', () => cancelModal.style.display = 'none');
+    window.addEventListener('click', e => { if (e.target === cancelModal) cancelModal.style.display = 'none'; });
 
-        fetch(`/api/events/${eventId}/cancel`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slotIndex, name })
+    // Cancel form submit
+    document.getElementById('cancelForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const slotIndex = document.getElementById('cancelSlot').value;
+      const name = document.getElementById('cancelName').value.trim();
+
+      fetch(`/api/events/${eventId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slotIndex, name })
+      })
+        .then(res => {
+          if (!res.ok) return res.json().then(err => Promise.reject(err));
+          return res.json();
         })
-          .then(res => {
-            if (!res.ok) return res.json().then(err => Promise.reject(err));
-            return res.json();
-          })
-          .then(() => location.reload())
-          .catch(err => alert(err.error || 'Error canceling signup'));
-      });
+        .then(() => location.reload())
+        .catch(err => alert(err.error || 'Error canceling signup'));
     });
   })
   .catch(() => {

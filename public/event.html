@@ -11,6 +11,20 @@
   <div class="container" id="eventContainer">
     <p>Loading event...</p>
   </div>
+  <!-- Cancel Signup Modal -->
+<div class="modal" id="cancelModal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeCancelModal">&times;</span>
+    <h2>Cancel My Signup</h2>
+    <form id="cancelForm">
+      <label for="cancelSlot">Select Time Slot</label>
+      <select id="cancelSlot" required></select>
+      <label for="cancelName">Your Name</label>
+      <input type="text" id="cancelName" required>
+      <button type="submit" style="background:#dc2626;">Cancel Signup</button>
+    </form>
+  </div>
+</div>
   <script src="js/event.js"></script>
 </body>
 </html>
