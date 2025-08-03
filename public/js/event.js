@@ -2,6 +2,13 @@ const params = new URLSearchParams(window.location.search);
 const eventId = params.get('id');
 const container = document.getElementById('eventContainer');
 
+function formatTime(timeStr) {
+  const [hour, minute] = timeStr.split(':').map(Number);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+}
+
 fetch(`/api/events/${eventId}`)
   .then(res => res.json())
   .then(event => {
@@ -22,7 +29,8 @@ fetch(`/api/events/${eventId}`)
       const spotsLeft = slot.maxSpots - slot.signups.length;
       html += `
         <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-          <p><strong>${slot.time}</strong> (${slot.hours})</p>
+          <p><strong>${formatTime(slot.time)}</strong></p>
+          <p style="color: gray;">${slot.hours} Service Hours</p>
           <p>Spots left: ${spotsLeft}</p>
           ${
             spotsLeft > 0
@@ -44,10 +52,7 @@ fetch(`/api/events/${eventId}`)
               ${
                 slot.signups.length > 0
                   ? slot.signups
-                      .map(
-                        (name) =>
-                          `<tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${name}</td></tr>`
-                      )
+                      .map(name => `<tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${name}</td></tr>`)
                       .join('')
                   : '<tr><td>No sign-ups yet</td></tr>'
               }

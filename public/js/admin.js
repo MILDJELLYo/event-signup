@@ -1,3 +1,29 @@
+// Check login
+const dashboard = document.querySelector('.container:last-of-type');
+dashboard.style.display = 'none';
+
+document.getElementById('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+
+  fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Invalid login');
+      return res.json();
+    })
+    .then(() => {
+      document.getElementById('loginContainer').style.display = 'none';
+      dashboard.style.display = 'block';
+      loadEvents();
+    })
+    .catch(err => alert(err.message));
+});
+
 function loadEvents() {
   fetch('/api/events')
     .then(res => res.json())
