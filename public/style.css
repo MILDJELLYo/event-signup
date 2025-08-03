@@ -52,16 +52,18 @@ button.danger:hover {
   align-items: center;
 }
 .modal-content {
-  max-height: 80vh; /* limit height */
-  overflow-y: auto; /* vertical scroll when needed */
-}
-.modal-content {
   background: white;
   padding: 2rem;
   border-radius: 12px;
   max-width: 500px;
   width: 100%;
   position: relative;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-content {
+  max-height: 80vh; /* limit height */
+  overflow-y: auto; /* vertical scroll when needed */
 }
 .close-btn {
   position: absolute;
@@ -81,6 +83,41 @@ button.danger:hover {
   border: 1px solid #ccc;
   margin-top: 0.3rem;
 }
+
+/* Signup form stacked fields (for event page) */
+.signupForm label {
+  display: block;
+  margin-top: 0.6rem;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.signupForm input {
+  width: 96%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.signupForm button {
+  margin-top: 1rem;
+  padding: 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.signupForm button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
 
 @media (max-width: 600px) {
   .container {
