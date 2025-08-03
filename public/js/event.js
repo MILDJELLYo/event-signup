@@ -36,6 +36,23 @@ fetch(`/api/events/${eventId}`)
               </form>`
               : `<div style="color:red; font-weight:bold;">Full</div>`
           }
+          <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+            <thead>
+              <tr><th style="text-align:left; border-bottom: 1px solid #ccc;">Signed Up</th></tr>
+            </thead>
+            <tbody>
+              ${
+                slot.signups.length > 0
+                  ? slot.signups
+                      .map(
+                        (name) =>
+                          `<tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${name}</td></tr>`
+                      )
+                      .join('')
+                  : '<tr><td>No sign-ups yet</td></tr>'
+              }
+            </tbody>
+          </table>
         </div>
       `;
     });
