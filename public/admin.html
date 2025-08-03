@@ -6,8 +6,9 @@
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
-<header>Event Admin Dashboard</header>
+<header>MHS Student Council - Admin</header>
 <div class="container">
+  <h1>Admin Dashboard</h1>
   <button id="createBtn">+ Create New Event</button>
   <div id="eventsList"></div>
 </div>
@@ -24,16 +25,17 @@
       <input type="date" id="date" required>
       <label>Location</label>
       <input type="text" id="location" required>
-      <label>Hours</label>
-      <input type="text" id="hours" required>
-      <label>Max Spots</label>
-      <input type="number" id="maxSpots" min="1" required>
       <label>Description</label>
       <textarea id="description" required></textarea>
       <label>Contact Name</label>
       <input type="text" id="contactName" required>
       <label>Contact Email</label>
       <input type="email" id="contactEmail" required>
+
+      <h3>Time Slots</h3>
+      <div id="timeSlotsContainer"></div>
+      <button type="button" id="addSlotBtn">Add Time Slot</button>
+
       <button type="submit">Create Event</button>
     </form>
   </div>
@@ -44,10 +46,7 @@
   <div class="modal-content">
     <span class="close-btn" id="closeSignupsModal">&times;</span>
     <h2 id="signupsTitle">Sign-Ups</h2>
-    <table id="signupsTable">
-      <thead><tr><th>#</th><th>Name</th></tr></thead>
-      <tbody></tbody>
-    </table>
+    <div id="signupsContent"></div>
   </div>
 </div>
 

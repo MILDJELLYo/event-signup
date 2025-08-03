@@ -5,54 +5,51 @@ const container = document.getElementById('eventContainer');
 fetch(`/api/events/${eventId}`)
   .then(res => res.json())
   .then(event => {
-    const spotsLeft = event.maxSpots - event.signups.length;
-    const eventFull = spotsLeft <= 0;
-
-    container.innerHTML = `
+    const dateStr = new Date(event.date).toLocaleDateString('en-US');
+    let html = `
       <h1>${event.title}</h1>
-
       <div style="border: 1px solid #ccc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <p><strong>Date:</strong> ${event.date}</p>
+        <p><strong>Date:</strong> ${dateStr}</p>
         <p><strong>Location:</strong> ${event.location}</p>
-        <p><strong>Hours:</strong> ${event.hours}</p>
         <p>${event.description}</p>
         <p><strong>Contact:</strong> ${event.contactName} - <a href="mailto:${event.contactEmail}">${event.contactEmail}</a></p>
       </div>
-
-      ${eventFull ? `<div style="background:#dc2626;color:white;padding:10px;border-radius:8px;margin-bottom:1rem;text-align:center;font-weight:600;">
-        Event Full
-      </div>` : ''}
-
-      <form id="signupForm" ${eventFull ? 'style="display:none;"' : ''}>
-        <label>First Name</label>
-        <input type="text" id="firstName" required>
-        <label>Last Name</label>
-        <input type="text" id="lastName" required>
-        <button type="submit">Sign Up</button>
-      </form>
-
-      <div class="spots" id="spotsLeft">Spots left: ${spotsLeft}</div>
-
-      <h2>Sign-Up List</h2>
-      <table>
-        <thead><tr><th>Name</th></tr></thead>
-        <tbody id="signupList">
-          ${event.signups.map(n => `<tr><td>${n}</td></tr>`).join('')}
-        </tbody>
-      </table>
     `;
 
-    if (!eventFull) {
-      document.getElementById('signupForm').addEventListener('submit', e => {
+    html += `<h2>Available Time Slots</h2>`;
+    event.timeSlots.forEach((slot, index) => {
+      const spotsLeft = slot.maxSpots - slot.signups.length;
+      html += `
+        <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+          <p><strong>${slot.time}</strong> (${slot.hours})</p>
+          <p>Spots left: ${spotsLeft}</p>
+          ${spotsLeft > 0 ? `
+            <form data-slot="${index}" class="signupForm">
+              <label>First Name</label>
+              <input type="text" name="firstName" required>
+              <label>Last Name</label>
+              <input type="text" name="lastName" required>
+              <button type="submit">Sign Up</button>
+            </form>
+          ` : `<div style="color:red;font-weight:bold;">Full</div>`}
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    document.querySelectorAll('.signupForm').forEach(form => {
+      form.addEventListener('submit', e => {
         e.preventDefault();
-        const name = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+        const slotIndex = e.target.dataset.slot;
+        const name = `${e.target.firstName.value} ${e.target.lastName.value}`;
         fetch(`/api/events/${eventId}/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name })
+          body: JSON.stringify({ slotIndex, name })
         })
         .then(res => res.json())
         .then(() => location.reload());
       });
-    }
+    });
   });

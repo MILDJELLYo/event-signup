@@ -22,34 +22,6 @@ header {
   margin: 20px auto;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 500px;
-  width: 100%;
-  position: relative;
-}
-
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
 button {
   background: #2563eb;
   color: white;
@@ -66,6 +38,44 @@ button.danger {
 }
 button.danger:hover {
   background: #b91c1c;
+}
+
+/* Modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+}
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 20px;
+  cursor: pointer;
+}
+.modal-content label {
+  display: block;
+  margin-top: 1rem;
+}
+.modal-content input, .modal-content textarea {
+  width: 96%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 0.3rem;
 }
 
 @media (max-width: 600px) {

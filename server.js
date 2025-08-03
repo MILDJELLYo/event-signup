@@ -19,10 +19,12 @@ function writeEvents(events) {
   fs.writeFileSync(EVENTS_FILE, JSON.stringify(events, null, 2));
 }
 
+// Get all events
 app.get('/api/events', (req, res) => {
   res.json(readEvents());
 });
 
+// Get single event
 app.get('/api/events/:id', (req, res) => {
   const events = readEvents();
   const event = events.find(e => e.id === req.params.id);
@@ -30,47 +32,49 @@ app.get('/api/events/:id', (req, res) => {
   res.json(event);
 });
 
+// Create event with time slots
 app.post('/api/events', (req, res) => {
-  const { title, date, location, hours, maxSpots, description, contactName, contactEmail } = req.body;
+  const { title, date, location, description, contactName, contactEmail, timeSlots } = req.body;
   const events = readEvents();
   const newEvent = {
     id: uuidv4(),
     title,
     date,
     location,
-    hours,
-    maxSpots: Number(maxSpots),
-    description: description || '',
-    contactName: contactName || '',
-    contactEmail: contactEmail || '',
-    signups: []
+    description,
+    contactName,
+    contactEmail,
+    timeSlots: timeSlots.map(slot => ({
+      time: slot.time,
+      hours: slot.hours,
+      maxSpots: Number(slot.maxSpots),
+      signups: []
+    }))
   };
   events.push(newEvent);
   writeEvents(events);
   res.status(201).json(newEvent);
 });
 
+// Sign up for a specific slot
 app.post('/api/events/:id/signup', (req, res) => {
-  const { name } = req.body;
+  const { slotIndex, name } = req.body;
   const events = readEvents();
   const event = events.find(e => e.id === req.params.id);
   if (!event) return res.status(404).json({ error: 'Event not found' });
-  if (event.signups.length >= event.maxSpots) return res.status(400).json({ error: 'No spots left' });
+  if (!event.timeSlots[slotIndex]) return res.status(400).json({ error: 'Invalid slot index' });
 
-  event.signups.push(name);
+  const slot = event.timeSlots[slotIndex];
+  if (slot.signups.length >= slot.maxSpots) {
+    return res.status(400).json({ error: 'No spots left for this time slot' });
+  }
+
+  slot.signups.push(name);
   writeEvents(events);
   res.json(event);
 });
 
-app.put('/api/events/:id', (req, res) => {
-  const events = readEvents();
-  const index = events.findIndex(e => e.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Event not found' });
-  events[index] = { ...events[index], ...req.body };
-  writeEvents(events);
-  res.json(events[index]);
-});
-
+// Delete event
 app.delete('/api/events/:id', (req, res) => {
   let events = readEvents();
   events = events.filter(e => e.id !== req.params.id);
