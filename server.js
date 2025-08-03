@@ -83,3 +83,18 @@ app.delete('/api/events/:id', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.post('/api/events/:id/cancel', (req, res) => {
+  const { slotIndex, name } = req.body;
+  const events = readEvents();
+  const event = events.find(e => e.id === req.params.id);
+  if (!event) return res.status(404).json({ error: 'Event not found' });
+
+  const slot = event.timeSlots[slotIndex];
+  const index = slot.signups.findIndex(s => s.toLowerCase() === name.toLowerCase());
+  if (index === -1) return res.status(404).json({ error: 'Signup not found' });
+
+  slot.signups.splice(index, 1);
+  writeEvents(events);
+  res.json({ success: true });
+});

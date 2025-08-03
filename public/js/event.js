@@ -44,6 +44,11 @@ fetch(`/api/events/${eventId}`)
               </form>`
               : `<div style="color:red; font-weight:bold;">Full</div>`
           }
+          <form data-slot="${index}" class="cancelForm" style="margin-top:1rem; border-top:1px solid #ccc; padding-top:0.5rem;">
+            <label for="cancelName_${index}">Cancel My Signup</label>
+            <input type="text" id="cancelName_${index}" name="cancelName" placeholder="Enter your name" required>
+            <button type="submit" style="background:#dc2626;">Cancel Signup</button>
+          </form>
           <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
             <thead>
               <tr><th style="text-align:left; border-bottom: 1px solid #ccc;">Signed Up</th></tr>
@@ -64,6 +69,7 @@ fetch(`/api/events/${eventId}`)
 
     container.innerHTML = html;
 
+    // Signup form handling
     document.querySelectorAll('.signupForm').forEach(form => {
       form.addEventListener('submit', e => {
         e.preventDefault();
@@ -83,6 +89,27 @@ fetch(`/api/events/${eventId}`)
           })
           .then(() => location.reload())
           .catch(err => alert(err.error || 'Error signing up'));
+      });
+    });
+
+    // Cancel form handling
+    document.querySelectorAll('.cancelForm').forEach(form => {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const slotIndex = e.target.dataset.slot;
+        const name = e.target.cancelName.value.trim();
+
+        fetch(`/api/events/${eventId}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slotIndex, name })
+        })
+          .then(res => {
+            if (!res.ok) return res.json().then(err => Promise.reject(err));
+            return res.json();
+          })
+          .then(() => location.reload())
+          .catch(err => alert(err.error || 'Error canceling signup'));
       });
     });
   })
