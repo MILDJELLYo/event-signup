@@ -25,6 +25,21 @@ const btnTimeSlots = document.getElementById('btnTimeSlots');
 const btnLunchPeriods = document.getElementById('btnLunchPeriods');
 const timeSlotsSection = document.getElementById('timeSlotsSection');
 const lunchPeriodsSection = document.getElementById('lunchPeriodsSection');
+btnTimeSlots.addEventListener('click', () => {
+  scheduleType = "timeSlots";
+  btnTimeSlots.classList.add('active');
+  btnLunchPeriods.classList.remove('active');
+  timeSlotsSection.style.display = 'block';
+  lunchPeriodsSection.style.display = 'none';
+});
+
+btnLunchPeriods.addEventListener('click', () => {
+  scheduleType = "lunchPeriods";
+  btnLunchPeriods.classList.add('active');
+  btnTimeSlots.classList.remove('active');
+  lunchPeriodsSection.style.display = 'block';
+  timeSlotsSection.style.display = 'none';
+});
 
 btnTimeSlots.addEventListener('click', () => {
   scheduleType = "timeSlots";
@@ -177,13 +192,13 @@ function validatePage(page) {
       alert('Please add at least one time slot.');
       return false;
     }
-    if (scheduleType === "lunchPeriods" && !lunchPeriodSelect.value) {
-      alert('Please select a lunch period.');
-      return false;
+    if (scheduleType === "lunchPeriods") {
+      if (!lunch5aMax.value || !lunch5aHours.value || !lunch5bMax.value || !lunch5bHours.value) {
+        alert('Please fill out all lunch period fields.');
+        return false;
+      }
     }
-  }
-  return true;
-}
+  }  
 
 function showReview() {
   const reviewDiv = document.getElementById('reviewContent');
@@ -201,8 +216,10 @@ function showReview() {
       return `${i + 1}. ${slot.querySelector('.slot-time').value} — Max: ${slot.querySelector('.slot-maxSpots').value}, Hours: ${slot.querySelector('.slot-hours').value}`;
     }).join('\n');
     review += `Time Slots:\n${slots}`;
-  } else {
-    review += `Lunch Period: ${lunchPeriodSelect.value}`;
+  } else if (scheduleType === "lunchPeriods") {
+    review += `Lunch Periods:\n`;
+    review += `5A — Max: ${lunch5aMax.value}, Hours: ${lunch5aHours.value}\n`;
+    review += `5B — Max: ${lunch5bMax.value}, Hours: ${lunch5bHours.value}`;
   }
   reviewDiv.textContent = review;
 }
@@ -254,8 +271,21 @@ form.addEventListener('submit', e => {
       signups: []
     }));
   } else if (scheduleType === "lunchPeriods") {
-    payload.lunchPeriod = lunchPeriodSelect.value;
-  }
+    payload.timeSlots = [
+      {
+        time: "5A Lunch",
+        maxSpots: parseInt(lunch5aMax.value, 10),
+        hours: parseInt(lunch5aHours.value, 10),
+        signups: []
+      },
+      {
+        time: "5B Lunch",
+        maxSpots: parseInt(lunch5bMax.value, 10),
+        hours: parseInt(lunch5bHours.value, 10),
+        signups: []
+      }
+    ];
+  }  
 
   fetch('/api/events', {
     method: 'POST',
@@ -368,4 +398,3 @@ function renderCalendar(month, year) {
 
 // Initial render
 renderCalendar(calendarMonth, calendarYear);
-

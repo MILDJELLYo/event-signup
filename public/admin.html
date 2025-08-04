@@ -102,9 +102,8 @@
       <div class="progress-bar">
         <div class="step active" data-step="1">Details</div>
         <div class="step" data-step="2">Date</div>
-        <div class="step" data-step="3">Schedule Type</div>
-        <div class="step" data-step="4">Schedule</div>
-        <div class="step" data-step="5">Review</div>
+        <div class="step" data-step="3">Schedule</div>
+        <div class="step" data-step="4">Review</div>
       </div>
 
       <form id="createEventForm">
@@ -129,7 +128,7 @@
           <input type="hidden" id="date" required />
         </div>
 
-        <!-- Step 3: Schedule Type -->
+        <!-- Step 3: Schedule -->
         <div class="page" data-page="3" style="display:none;">
          <h3>Step 3: Choose Schedule Type</h3>
          
@@ -141,53 +140,29 @@
         <!-- Time Slots Section -->
         <div id="timeSlotsSection" style="display:none;">
           <div id="timeSlotsContainer"></div>
-          <button type="button" id="addSlotBtn">Add Time Slot</button>
-          <button type="button" id="removeSlotBtn" style="margin-left:10px;">Remove Last Slot</button>
-        </div>
-        
-        <!-- Lunch Periods Section -->
-        <div id="lunchPeriodsSection" style="display:none;">
-          <label>5A Lunch - Max Volunteers</label>
-          <input type="number" id="lunch5aMax" min="1" required />
-          <label>5A Lunch - Service Hours</label>
-          <input type="number" id="lunch5aHours" min="1" required />
-          
-          <label>5B Lunch - Max Volunteers</label>
-          <input type="number" id="lunch5bMax" min="1" required />
-          <label>5B Lunch - Service Hours</label>
-          <input type="number" id="lunch5bHours" min="1" required />
-        </div>
-      </div>
-
-
-        <!-- Step 4: Time Slots -->
-        <div class="page" data-page="4" id="timeSlotsPage" style="display:none;">
-          <div id="timeSlotsContainer"></div>
           <div style="margin-top:1rem;">
             <button type="button" id="addSlotBtn">Add Time Slot</button>
-            <button type="button" id="removeSlotBtn" style="margin-left:10px; background: #dc2626; color:white;">Remove Last Slot</button>
+            <button type="button" id="removeSlotBtn" style="margin-left:10px; background: #dc2626; color:white; border:none; padding: 5px 10px; border-radius: 4px;">Remove Last Slot</button>
           </div>
         </div>
 
-        <!-- Step 4: Lunch Periods -->
-        <div class="page" data-page="4" id="lunchPeriodsPage" style="display:none;">
-          <h3>Lunch Period Settings</h3>
-          <div>
-            <label>5A Lunch - Max Volunteers</label>
-            <input type="number" id="lunch5aMax" min="1" required />
-            <label>5A Lunch - Service Hours</label>
-            <input type="number" id="lunch5aHours" min="1" required />
-          </div>
-          <div style="margin-top:1rem;">
-            <label>5B Lunch - Max Volunteers</label>
-            <input type="number" id="lunch5bMax" min="1" required />
-            <label>5B Lunch - Service Hours</label>
-            <input type="number" id="lunch5bHours" min="1" required />
-          </div>
+        <!-- Lunch Periods Section -->
+        <div id="lunchPeriodsSection" style="display:none;">
+          <h4>5A Lunch</h4>
+          <label>Max Spots</label>
+          <input type="number" id="lunch5aMax" min="1" required />
+          <label>Service Hours</label>
+          <input type="number" id="lunch5aHours" min="1" required />
+          
+          <h4>5B Lunch</h4>
+          <label>Max Spots</label>
+          <input type="number" id="lunch5bMax" min="1" required />
+          <label>Service Hours</label>
+          <input type="number" id="lunch5bHours" min="1" required />
         </div>
 
-        <!-- Step 5: Review -->
-        <div class="page" data-page="5" style="display:none;">
+        <!-- Step 4: Review -->
+        <div class="page" data-page="4" style="display:none;">
           <h3>Review Your Event</h3>
           <pre id="reviewContent" style="white-space: pre-wrap;"></pre>
         </div>
