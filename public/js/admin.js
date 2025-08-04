@@ -97,30 +97,6 @@ removeSlotBtn.addEventListener('click', () => {
   }
 });
 
-// Schedule type selection
-let scheduleType = "";
-const btnTimeSlots = document.getElementById('btnTimeSlots');
-const btnLunchPeriods = document.getElementById('btnLunchPeriods');
-const timeSlotsSection = document.getElementById('timeSlotsSection');
-const lunchPeriodSection = document.getElementById('lunchPeriodSection');
-const lunchPeriodSelect = document.getElementById('lunchPeriod');
-
-btnTimeSlots.addEventListener('click', () => {
-  scheduleType = "timeSlots";
-  btnTimeSlots.classList.add('active');
-  btnLunchPeriods.classList.remove('active');
-  timeSlotsSection.style.display = 'block';
-  lunchPeriodSection.style.display = 'none';
-});
-
-btnLunchPeriods.addEventListener('click', () => {
-  scheduleType = "lunchPeriods";
-  btnLunchPeriods.classList.add('active');
-  btnTimeSlots.classList.remove('active');
-  lunchPeriodSection.style.display = 'block';
-  timeSlotsSection.style.display = 'none';
-});
-
 // Load events
 function loadEvents() {
   fetch('/api/events')
