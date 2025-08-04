@@ -67,7 +67,6 @@ function loadEvents() {
         eventsList.appendChild(eventCard);
       });
 
-      // View signups button click
       document.querySelectorAll('.viewSignupsBtn').forEach(btn => {
         btn.addEventListener('click', e => {
           const id = e.target.dataset.id;
@@ -89,49 +88,68 @@ function loadEvents() {
             });
         });
       });
-
-      // TODO: Add edit and delete handlers as needed
     });
 }
 loadEvents();
 
-// --- Multi-step form navigation ---
+/* === Multi-step Form Navigation === */
 const form = document.getElementById('createEventForm');
-const steps = Array.from(document.querySelectorAll('.step-content'));
+const pages = Array.from(document.querySelectorAll('.page'));
 const progressSteps = Array.from(document.querySelectorAll('.progress-bar .step'));
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const submitBtn = document.getElementById('submitBtn');
+const hiddenDateInput = document.getElementById('date');
 
-let currentStep = 0;
+let currentPage = 0;
 
-function showStep(step) {
-  steps.forEach((s, i) => {
-    s.style.display = i === step ? 'block' : 'none';
-  });
-  progressSteps.forEach((ps, i) => {
-    ps.classList.toggle('active', i === step);
+function showPage(pageIndex) {
+  pages.forEach((page, i) => {
+    page.style.display = i === pageIndex ? 'block' : 'none';
   });
 
-  prevBtn.disabled = step === 0;
-  nextBtn.style.display = step === steps.length - 1 ? 'none' : 'inline-block';
-  submitBtn.style.display = step === steps.length - 1 ? 'inline-block' : 'none';
+  progressSteps.forEach((step, i) => {
+    step.classList.toggle('active', i === pageIndex);
+  });
 
-  if (step === steps.length - 1) {
-    showReview();
-  }
+  prevBtn.disabled = pageIndex === 0;
+  nextBtn.style.display = pageIndex === pages.length - 1 ? 'none' : 'inline-block';
+  submitBtn.style.display = pageIndex === pages.length - 1 ? 'inline-block' : 'none';
 }
 
-function showReview() {
-  const reviewDiv = document.getElementById('reviewContent');
+function validatePage(pageIndex) {
+  const inputs = pages[pageIndex].querySelectorAll('input, textarea');
+  for (const input of inputs) {
+    if (!input.checkValidity()) {
+      input.reportValidity();
+      return false;
+    }
+  }
+  if (pageIndex === 2) {
+    if (timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
+      alert('Please add at least one time slot.');
+      return false;
+    }
+  }
+  if (pageIndex === 1) {
+    if (!hiddenDateInput.value) {
+      alert('Please select a date.');
+      return false;
+    }
+  }
+  return true;
+}
+
+function updateReview() {
+  const reviewContent = document.getElementById('reviewContent');
   const title = document.getElementById('title').value.trim();
   const location = document.getElementById('location').value.trim();
   const description = document.getElementById('description').value.trim();
   const contactName = document.getElementById('contactName').value.trim();
   const contactEmail = document.getElementById('contactEmail').value.trim();
-  const date = document.getElementById('date').value.trim();
+  const date = hiddenDateInput.value;
 
-  const timeSlots = Array.from(document.querySelectorAll('.time-slot')).map(slotEl => ({
+  const timeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot')).map(slotEl => ({
     time: slotEl.querySelector('.slot-time').value.trim(),
     maxSpots: slotEl.querySelector('.slot-maxSpots').value.trim(),
     hours: slotEl.querySelector('.slot-hours').value.trim()
@@ -146,72 +164,152 @@ Date: ${date}
 
 Time Slots:
 `;
-
   timeSlots.forEach((slot, i) => {
     reviewText += `  ${i + 1}. Time: ${slot.time}, Max Spots: ${slot.maxSpots}, Service Hours: ${slot.hours}\n`;
   });
 
-  reviewDiv.textContent = reviewText;
+  reviewContent.textContent = reviewText;
 }
 
 prevBtn.addEventListener('click', () => {
-  if (currentStep > 0) {
-    currentStep--;
-    showStep(currentStep);
+  if (currentPage > 0) {
+    currentPage--;
+    showPage(currentPage);
   }
 });
 
 nextBtn.addEventListener('click', () => {
-  if (!validateStep(currentStep)) return;
-
-  if (currentStep < steps.length - 1) {
-    currentStep++;
-    showStep(currentStep);
+  if (!validatePage(currentPage)) return;
+  if (currentPage < pages.length - 1) {
+    currentPage++;
+    if (currentPage === pages.length - 1) updateReview();
+    showPage(currentPage);
   }
 });
 
-function validateStep(step) {
-  const inputs = steps[step].querySelectorAll('input, textarea');
-  for (const input of inputs) {
-    if (!input.checkValidity()) {
-      input.reportValidity();
-      return false;
+showPage(currentPage);
+
+/* === Custom Calendar UI === */
+let today = new Date();
+let selectedDate = today;
+let calendarMonth = today.getMonth();
+let calendarYear = today.getFullYear();
+
+function renderCalendar(month, year) {
+  const calendarElement = document.getElementById('calendar');
+  calendarElement.innerHTML = '';
+
+  const header = document.createElement('div');
+  header.classList.add('calendar-header');
+
+  const prev = document.createElement('button');
+  prev.textContent = '<';
+  prev.addEventListener('click', () => {
+    calendarMonth--;
+    if (calendarMonth < 0) {
+      calendarMonth = 11;
+      calendarYear--;
     }
-  }
-  // Extra validation for time slots if step 2 (index 2)
-  if (step === 2) {
-    const slots = timeSlotsContainer.querySelectorAll('.time-slot');
-    if (slots.length === 0) {
-      alert('Please add at least one time slot.');
-      return false;
+    renderCalendar(calendarMonth, calendarYear);
+  });
+
+  const next = document.createElement('button');
+  next.textContent = '>';
+  next.addEventListener('click', () => {
+    calendarMonth++;
+    if (calendarMonth > 11) {
+      calendarMonth = 0;
+      calendarYear++;
     }
+    renderCalendar(calendarMonth, calendarYear);
+  });
+
+  const monthYear = document.createElement('div');
+  monthYear.textContent = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  header.appendChild(prev);
+  header.appendChild(monthYear);
+  header.appendChild(next);
+  calendarElement.appendChild(header);
+
+  const weekdays = document.createElement('div');
+  weekdays.classList.add('calendar-weekdays');
+  ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+    const d = document.createElement('div');
+    d.textContent = day;
+    weekdays.appendChild(d);
+  });
+  calendarElement.appendChild(weekdays);
+
+  const days = document.createElement('div');
+  days.classList.add('calendar-days');
+
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < firstDayIndex; i++) {
+    const blank = document.createElement('div');
+    blank.classList.add('calendar-day', 'disabled');
+    days.appendChild(blank);
   }
-  // For date step (index 1), check if a date is selected
-  if (step === 1) {
-    if (!document.getElementById('date').value) {
-      alert('Please select a date.');
-      return false;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const day = document.createElement('div');
+    day.classList.add('calendar-day');
+    day.textContent = d;
+    const thisDate = new Date(year, month, d);
+
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (thisDate < todayOnly) {
+      day.classList.add('disabled');
+    } else {
+      day.addEventListener('click', () => {
+        selectedDate = thisDate;
+        hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
+        highlightSelectedDate();
+      });
     }
+
+    days.appendChild(day);
   }
-  return true;
+
+  calendarElement.appendChild(days);
+  highlightSelectedDate();
 }
 
-showStep(currentStep);
+function highlightSelectedDate() {
+  const dayElements = document.querySelectorAll('.calendar-day');
+  dayElements.forEach(dayEl => {
+    dayEl.classList.remove('selected');
+  });
 
-// Handle event creation submit
+  if (!selectedDate) return;
+  if (selectedDate.getMonth() !== calendarMonth || selectedDate.getFullYear() !== calendarYear) return;
+
+  const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
+  const dayIndex = firstDayIndex + selectedDate.getDate() - 1;
+  const dayElementsArr = Array.from(document.querySelectorAll('.calendar-day'));
+  if (dayElementsArr[dayIndex]) {
+    dayElementsArr[dayIndex].classList.add('selected');
+  }
+}
+
+hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
+renderCalendar(calendarMonth, calendarYear);
+
+// Handle event creation
 form.addEventListener('submit', e => {
   e.preventDefault();
-
-  if (!validateStep(currentStep)) return;
+  if (!validatePage(currentPage)) return;
 
   const title = document.getElementById('title').value.trim();
-  const date = document.getElementById('date').value.trim();
+  const date = hiddenDateInput.value.trim();
   const location = document.getElementById('location').value.trim();
   const description = document.getElementById('description').value.trim();
   const contactName = document.getElementById('contactName').value.trim();
   const contactEmail = document.getElementById('contactEmail').value.trim();
 
-  const timeSlots = Array.from(document.querySelectorAll('.time-slot')).map(slotEl => ({
+  const timeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot')).map(slotEl => ({
     time: slotEl.querySelector('.slot-time').value.trim(),
     maxSpots: parseInt(slotEl.querySelector('.slot-maxSpots').value, 10),
     hours: parseInt(slotEl.querySelector('.slot-hours').value, 10),
@@ -239,143 +337,10 @@ form.addEventListener('submit', e => {
       alert('Event created successfully!');
       form.reset();
       timeSlotsContainer.innerHTML = '';
-      currentStep = 0;
-      showStep(currentStep);
+      currentPage = 0;
+      showPage(currentPage);
       document.getElementById('createModal').style.display = 'none';
       loadEvents();
     })
     .catch(err => alert(err.error || 'Error creating event'));
 });
-
-/* === Custom Calendar UI === */
-
-const calendarElement = document.getElementById('calendar');
-const hiddenDateInput = document.getElementById('date');
-
-let today = new Date();
-let selectedDate = null;
-let calendarMonth = today.getMonth();
-let calendarYear = today.getFullYear();
-
-function renderCalendar(month, year) {
-  calendarElement.innerHTML = '';
-
-  // Header with month and year and nav buttons
-  const header = document.createElement('div');
-  header.classList.add('calendar-header');
-
-  const prevBtn = document.createElement('button');
-  prevBtn.textContent = '<';
-  prevBtn.addEventListener('click', () => {
-    calendarMonth--;
-    if (calendarMonth < 0) {
-      calendarMonth = 11;
-      calendarYear--;
-    }
-    renderCalendar(calendarMonth, calendarYear);
-  });
-
-  const nextBtn = document.createElement('button');
-  nextBtn.textContent = '>';
-  nextBtn.addEventListener('click', () => {
-    calendarMonth++;
-    if (calendarMonth > 11) {
-      calendarMonth = 0;
-      calendarYear++;
-    }
-    renderCalendar(calendarMonth, calendarYear);
-  });
-
-  const monthYear = document.createElement('div');
-  monthYear.textContent = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
-
-  header.appendChild(prevBtn);
-  header.appendChild(monthYear);
-  header.appendChild(nextBtn);
-
-  calendarElement.appendChild(header);
-
-  // Weekdays
-  const weekdays = document.createElement('div');
-  weekdays.classList.add('calendar-weekdays');
-  ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-    const d = document.createElement('div');
-    d.textContent = day;
-    weekdays.appendChild(d);
-  });
-  calendarElement.appendChild(weekdays);
-
-  // Days
-  const days = document.createElement('div');
-  days.classList.add('calendar-days');
-
-  // First day of month (0=Sun..6=Sat)
-  const firstDayIndex = new Date(year, month, 1).getDay();
-
-  // Days in month
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  // Fill blank days before first day
-  for (let i = 0; i < firstDayIndex; i++) {
-    const blank = document.createElement('div');
-    blank.classList.add('calendar-day', 'disabled');
-    days.appendChild(blank);
-  }
-
-  // Fill days
-  for (let d = 1; d <= daysInMonth; d++) {
-    const day = document.createElement('div');
-    day.classList.add('calendar-day');
-    day.textContent = d;
-
-    const thisDate = new Date(year, month, d);
-
-    // Disable past days before today
-    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    if (thisDate < todayOnly) {
-      day.classList.add('disabled');
-    } else {
-      day.addEventListener('click', () => {
-        selectedDate = thisDate;
-        hiddenDateInput.value = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd format
-        highlightSelectedDate();
-      });
-    }
-
-    days.appendChild(day);
-  }
-
-  calendarElement.appendChild(days);
-  highlightSelectedDate();
-}
-
-function highlightSelectedDate() {
-  const dayElements = calendarElement.querySelectorAll('.calendar-day');
-  dayElements.forEach(dayEl => {
-    dayEl.classList.remove('selected');
-  });
-
-  if (!selectedDate) return;
-
-  // Only highlight if calendar is showing the month & year of selectedDate
-  if (selectedDate.getMonth() !== calendarMonth || selectedDate.getFullYear() !== calendarYear) return;
-
-  // Find the day element that matches selectedDate date number
-  const dayNumber = selectedDate.getDate();
-
-  // The days start after firstDayIndex disabled days, so index of dayNumber is firstDayIndex + dayNumber - 1
-  const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
-  const dayIndex = firstDayIndex + dayNumber - 1;
-  const dayElementsArr = Array.from(calendarElement.querySelectorAll('.calendar-day'));
-
-  if (dayElementsArr[dayIndex]) {
-    dayElementsArr[dayIndex].classList.add('selected');
-  }
-}
-
-// Initialize calendar with today's date selected by default
-selectedDate = today;
-calendarMonth = today.getMonth();
-calendarYear = today.getFullYear();
-hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
-renderCalendar(calendarMonth, calendarYear);
