@@ -95,7 +95,7 @@ function loadEvents() {
 }
 loadEvents();
 
-// Multi-step form handling
+// --- Multi-step form navigation ---
 const form = document.getElementById('createEventForm');
 const steps = Array.from(document.querySelectorAll('.step-content'));
 const progressSteps = Array.from(document.querySelectorAll('.progress-bar .step'));
@@ -107,7 +107,7 @@ let currentStep = 0;
 
 function showStep(step) {
   steps.forEach((s, i) => {
-    s.classList.toggle('active', i === step);
+    s.style.display = i === step ? 'block' : 'none';
   });
   progressSteps.forEach((ps, i) => {
     ps.classList.toggle('active', i === step);
@@ -178,7 +178,7 @@ function validateStep(step) {
       return false;
     }
   }
-  // Extra validation for time slots if step 3
+  // Extra validation for time slots if step 2 (index 2)
   if (step === 2) {
     const slots = timeSlotsContainer.querySelectorAll('.time-slot');
     if (slots.length === 0) {
@@ -186,7 +186,7 @@ function validateStep(step) {
       return false;
     }
   }
-  // For date step, check if a date is selected
+  // For date step (index 1), check if a date is selected
   if (step === 1) {
     if (!document.getElementById('date').value) {
       alert('Please select a date.');
@@ -379,97 +379,3 @@ calendarMonth = today.getMonth();
 calendarYear = today.getFullYear();
 hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
 renderCalendar(calendarMonth, calendarYear);
-
-const pages = Array.from(document.querySelectorAll('.page'));
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-const submitBtn = document.getElementById('submitBtn');
-let currentPage = 0;
-
-function showPage(index) {
-  pages.forEach((page, i) => {
-    page.style.display = i === index ? 'block' : 'none';
-  });
-  prevBtn.disabled = index === 0;
-  nextBtn.style.display = index === pages.length - 1 ? 'none' : 'inline-block';
-  submitBtn.style.display = index === pages.length - 1 ? 'inline-block' : 'none';
-
-  if (index === pages.length - 1) {
-    // Show review summary
-    showReview();
-  }
-}
-
-function validatePage(index) {
-  const inputs = pages[index].querySelectorAll('input, textarea');
-  for (const input of inputs) {
-    if (!input.checkValidity()) {
-      input.reportValidity();
-      return false;
-    }
-  }
-  if (index === 2) { // Time Slots page validation
-    const slots = timeSlotsContainer.querySelectorAll('.time-slot');
-    if (slots.length === 0) {
-      alert('Please add at least one time slot.');
-      return false;
-    }
-  }
-  if (index === 1) { // Date page validation
-    if (!document.getElementById('date').value) {
-      alert('Please select a date.');
-      return false;
-    }
-  }
-  return true;
-}
-
-prevBtn.addEventListener('click', () => {
-  if (currentPage > 0) {
-    currentPage--;
-    showPage(currentPage);
-  }
-});
-
-nextBtn.addEventListener('click', () => {
-  if (!validatePage(currentPage)) return;
-  if (currentPage < pages.length - 1) {
-    currentPage++;
-    showPage(currentPage);
-  }
-});
-
-function showReview() {
-  const reviewDiv = document.getElementById('reviewContent');
-  const title = document.getElementById('title').value.trim();
-  const location = document.getElementById('location').value.trim();
-  const description = document.getElementById('description').value.trim();
-  const contactName = document.getElementById('contactName').value.trim();
-  const contactEmail = document.getElementById('contactEmail').value.trim();
-  const date = document.getElementById('date').value.trim();
-
-  const timeSlots = Array.from(document.querySelectorAll('.time-slot')).map(slotEl => ({
-    time: slotEl.querySelector('.slot-time').value.trim(),
-    maxSpots: slotEl.querySelector('.slot-maxSpots').value.trim(),
-    hours: slotEl.querySelector('.slot-hours').value.trim()
-  }));
-
-  let reviewText = `
-Title: ${title}
-Location: ${location}
-Description: ${description}
-Contact: ${contactName} (${contactEmail})
-Date: ${date}
-
-Time Slots:
-`;
-
-  timeSlots.forEach((slot, i) => {
-    reviewText += `  ${i + 1}. Time: ${slot.time}, Max Spots: ${slot.maxSpots}, Service Hours: ${slot.hours}\n`;
-  });
-
-  reviewDiv.textContent = reviewText;
-}
-
-// Initialize first page visible
-showPage(currentPage);
