@@ -156,3 +156,11 @@ button.danger:hover {
   font-size: 20px;
   cursor: pointer;
 }
+
+.step-container {
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}

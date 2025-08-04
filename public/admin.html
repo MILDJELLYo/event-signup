@@ -5,104 +5,157 @@
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="../style.css" />
   <style>
-    /* Basic tab styles */
-    .tab {
+    /* Step container styling */
+    .step-container {
+      border: 1px solid #ddd;
+      padding: 1.5rem;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Modal styling tweaks */
+    .modal {
       display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
     }
-    .tab.active {
-      display: block;
+
+    .modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      box-sizing: border-box;
+      position: relative;
     }
-    .tab-buttons {
-      margin-bottom: 1rem;
-    }
-    .tab-buttons button {
-      margin-right: 0.5rem;
-      padding: 0.5rem 1rem;
+
+    .close-btn {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      font-size: 1.5rem;
+      font-weight: bold;
       cursor: pointer;
     }
-    .tab-buttons button.active {
-      font-weight: bold;
-      background-color: #ddd;
+
+    /* Buttons layout in slots step */
+    #step-slots > div button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+
+    #addSlotBtn {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    #removeSlotBtn {
+      background-color: #dc2626;
+      color: white;
+    }
+
+    /* Margin for buttons container */
+    .buttons-row {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    /* Margin for time slots container */
+    #timeSlotsContainer .time-slot {
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
-<header>MHS Student Council - Admin</header>
-<div class="container">
-  <h1>Admin Dashboard</h1>
-  <button id="createBtn">+ Create New Event</button>
-  <div id="eventsList"></div>
-</div>
+  <header>MHS Student Council - Admin</header>
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    <button id="createBtn">+ Create New Event</button>
+    <div id="eventsList"></div>
+  </div>
 
-<!-- Create Event Modal -->
-<div class="modal" id="createModal" style="display:none;">
-  <div class="modal-content" style="max-width:600px;">
-    <span class="close-btn" id="closeCreateModal" style="cursor:pointer;">&times;</span>
-    <h2>Create New Event</h2>
+  <!-- Create Event Modal -->
+  <div class="modal" id="createModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeCreateModal">&times;</span>
 
-    <div class="tab-buttons">
-      <button type="button" class="tab-btn active" data-tab="1">1. Details</button>
-      <button type="button" class="tab-btn" data-tab="2">2. Time Slots</button>
-      <button type="button" class="tab-btn" data-tab="3">3. Review & Create</button>
+      <form id="createEventForm" novalidate>
+        <!-- Step 1: Details -->
+        <div class="step-container" id="step-details">
+          <h2>Event Details</h2>
+          <label>Event Title</label>
+          <input type="text" id="title" required />
+
+          <label>Location</label>
+          <input type="text" id="location" required />
+
+          <label>Description</label>
+          <textarea id="description" required></textarea>
+
+          <label>Contact Name</label>
+          <input type="text" id="contactName" required />
+
+          <label>Contact Email</label>
+          <input type="email" id="contactEmail" required />
+
+          <div class="buttons-row">
+            <button type="button" id="nextToDate">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 2: Date -->
+        <div class="step-container" id="step-date" style="display:none;">
+          <h2>Select Date</h2>
+          <input type="date" id="date" required />
+
+          <div class="buttons-row">
+            <button type="button" id="backToDetails">Back</button>
+            <button type="button" id="nextToSlots">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Time Slots -->
+        <div class="step-container" id="step-slots" style="display:none;">
+          <h2>Time Slots</h2>
+          <div id="timeSlotsContainer"></div>
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <button type="button" id="addSlotBtn">Add Time Slot</button>
+            <button type="button" id="removeSlotBtn">Remove Time Slot</button>
+          </div>
+          <div class="buttons-row">
+            <button type="button" id="backToDate">Back</button>
+            <button type="submit" id="createEventSubmit">Create Event</button>
+          </div>
+        </div>
+      </form>
     </div>
-
-    <form id="createEventForm">
-
-      <!-- Step 1: Details -->
-      <div class="tab active" data-tab="1">
-        <label>Event Title</label>
-        <input type="text" id="title" required />
-
-        <label>Date</label>
-        <input type="date" id="date" required />
-
-        <label>Location</label>
-        <input type="text" id="location" required />
-
-        <label>Description</label>
-        <textarea id="description" required></textarea>
-
-        <label>Contact Name</label>
-        <input type="text" id="contactName" required />
-
-        <label>Contact Email</label>
-        <input type="email" id="contactEmail" required />
-
-        <button type="button" id="toStep2">Next: Time Slots →</button>
-      </div>
-
-      <!-- Step 2: Time Slots -->
-      <div class="tab" data-tab="2">
-        <h3>Time Slots</h3>
-        <div id="timeSlotsContainer"></div>
-        <button type="button" id="addSlotBtn">Add Time Slot</button>
-        <br /><br />
-        <button type="button" id="backToStep1">← Back to Details</button>
-        <button type="button" id="toStep3">Next: Review & Create →</button>
-      </div>
-
-      <!-- Step 3: Review & Create -->
-      <div class="tab" data-tab="3">
-        <h3>Review Your Event</h3>
-        <div id="reviewContent" style="white-space: pre-wrap; background:#f9f9f9; padding:10px; border:1px solid #ccc; max-height:300px; overflow-y:auto;"></div>
-        <br />
-        <button type="button" id="backToStep2">← Back to Time Slots</button>
-        <button type="submit">Create Event</button>
-      </div>
-
-    </form>
   </div>
-</div>
 
-<!-- View Sign-Ups Modal -->
-<div class="modal" id="signupsModal">
-  <div class="modal-content">
-    <span class="close-btn" id="closeSignupsModal">&times;</span>
-    <h2 id="signupsTitle">Sign-Ups</h2>
-    <div id="signupsContent"></div>
+  <!-- View Sign-Ups Modal -->
+  <div class="modal" id="signupsModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeSignupsModal">&times;</span>
+      <h2 id="signupsTitle">Sign-Ups</h2>
+      <div id="signupsContent"></div>
+    </div>
   </div>
-</div>
 
-<script src="js/admin.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>
