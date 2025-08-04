@@ -82,6 +82,23 @@
     .hidden {
       display: none;
     }
+
+    /* Make modal scrollable and keep buttons visible */
+    .modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-navigation {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 1rem 0;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+    }
   </style>
 </head>
 <body>
@@ -130,40 +147,38 @@
 
         <!-- Step 3: Schedule -->
         <div class="page" data-page="3" style="display:none;">
-         <h3>Step 3: Choose Schedule Type</h3>
-         
-         <div class="form-group">
-          <label>Select Schedule Type</label>
-          <div class="schedule-type-container">
-            <button type="button" id="btnTimeSlots" class="schedule-type-btn">Time Slots</button>
-            <button type="button" id="btnLunchPeriods" class="schedule-type-btn">Lunch Periods</button>
+          <h3>Step 3: Choose Schedule Type</h3>
+          <div class="form-group">
+            <label>Select Schedule Type</label>
+            <div class="schedule-type-container">
+              <button type="button" id="btnTimeSlots" class="schedule-type-btn">Time Slots</button>
+              <button type="button" id="btnLunchPeriods" class="schedule-type-btn">Lunch Periods</button>
+            </div>
           </div>
+          <!-- Time Slots Section -->
+          <div id="timeSlotsSection" style="display: none;">
+            <div id="timeSlotsContainer"></div>
+            <button type="button" id="addSlotBtn">Add Time Slot</button>
+            <button type="button" id="removeSlotBtn">Remove Last Slot</button>
+          </div>
+          <!-- Lunch Periods Section -->
+          <div id="lunchPeriodsSection" style="display: none;">
+            <div>
+              <h4>5A Lunch</h4>
+              <label>Max Spots</label>
+              <input type="number" id="lunch5aMax" min="1" required>
+              <label>Service Hours</label>
+              <input type="number" id="lunch5aHours" min="1" required>
+            </div>
+            <div>
+              <h4>5B Lunch</h4>
+              <label>Max Spots</label>
+              <input type="number" id="lunch5bMax" min="1" required>
+              <label>Service Hours</label>
+              <input type="number" id="lunch5bHours" min="1" required>
+            </div>
+          </div>        
         </div>
-        
-        <!-- Time Slots Section -->
-        <div id="timeSlotsSection" style="display: none;">
-          <div id="timeSlotsContainer"></div>
-          <button type="button" id="addSlotBtn">Add Time Slot</button>
-          <button type="button" id="removeSlotBtn">Remove Last Slot</button>
-        </div>
-        
-        <!-- Lunch Periods Section -->
-        <div id="lunchPeriodsSection" style="display: none;">
-          <div>
-            <h4>5A Lunch</h4>
-            <label>Max Spots</label>
-            <input type="number" id="lunch5aMax" min="1" required>
-            <label>Service Hours</label>
-            <input type="number" id="lunch5aHours" min="1" required>
-          </div>
-          <div>
-            <h4>5B Lunch</h4>
-            <label>Max Spots</label>
-            <input type="number" id="lunch5bMax" min="1" required>
-            <label>Service Hours</label>
-            <input type="number" id="lunch5bHours" min="1" required>
-          </div>
-        </div>        
 
         <!-- Step 4: Review -->
         <div class="page" data-page="4" style="display:none;">
@@ -172,7 +187,7 @@
         </div>
 
         <!-- Navigation buttons -->
-        <div class="form-navigation" style="margin-top: 3rem; display: flex; justify-content: space-between;">
+        <div class="form-navigation">
           <button type="button" id="prevBtn" disabled>Previous</button>
           <button type="button" id="nextBtn">Next</button>
           <button type="submit" id="submitBtn" style="display:none;">Create Event</button>
