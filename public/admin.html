@@ -131,13 +131,34 @@
 
         <!-- Step 3: Schedule Type -->
         <div class="page" data-page="3" style="display:none;">
-          <h3>Choose Schedule Type</h3>
-          <div class="schedule-type-buttons">
-            <button type="button" class="schedule-type-btn" data-type="timeSlots">Time Slots</button>
-            <button type="button" class="schedule-type-btn" data-type="lunchPeriods">Lunch Periods</button>
-          </div>
-          <input type="hidden" id="scheduleType" required />
+         <h3>Step 3: Choose Schedule Type</h3>
+         
+         <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+          <button type="button" id="btnTimeSlots" class="schedule-type-btn">Time Slots</button>
+          <button type="button" id="btnLunchPeriods" class="schedule-type-btn">Lunch Periods</button>
         </div>
+        
+        <!-- Time Slots Section -->
+        <div id="timeSlotsSection" style="display:none;">
+          <div id="timeSlotsContainer"></div>
+          <button type="button" id="addSlotBtn">Add Time Slot</button>
+          <button type="button" id="removeSlotBtn" style="margin-left:10px;">Remove Last Slot</button>
+        </div>
+        
+        <!-- Lunch Periods Section -->
+        <div id="lunchPeriodsSection" style="display:none;">
+          <label>5A Lunch - Max Volunteers</label>
+          <input type="number" id="lunch5aMax" min="1" required />
+          <label>5A Lunch - Service Hours</label>
+          <input type="number" id="lunch5aHours" min="1" required />
+          
+          <label>5B Lunch - Max Volunteers</label>
+          <input type="number" id="lunch5bMax" min="1" required />
+          <label>5B Lunch - Service Hours</label>
+          <input type="number" id="lunch5bHours" min="1" required />
+        </div>
+      </div>
+
 
         <!-- Step 4: Time Slots -->
         <div class="page" data-page="4" id="timeSlotsPage" style="display:none;">

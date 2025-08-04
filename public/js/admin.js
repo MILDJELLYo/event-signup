@@ -19,25 +19,27 @@ window.addEventListener('click', e => {
   }
 });
 
-// === Schedule Type Handling ===
-const scheduleTypeButtons = document.querySelectorAll('.schedule-type-btn');
+// === Schedule Type Handling (Fixed) ===
+let scheduleType = "";
+const btnTimeSlots = document.getElementById('btnTimeSlots');
+const btnLunchPeriods = document.getElementById('btnLunchPeriods');
 const timeSlotsSection = document.getElementById('timeSlotsSection');
 const lunchPeriodsSection = document.getElementById('lunchPeriodsSection');
 
-scheduleTypeButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const type = btn.dataset.type;
+btnTimeSlots.addEventListener('click', () => {
+  scheduleType = "timeSlots";
+  btnTimeSlots.classList.add('active');
+  btnLunchPeriods.classList.remove('active');
+  timeSlotsSection.style.display = 'block';
+  lunchPeriodsSection.style.display = 'none';
+});
 
-    // Hide both sections first
-    timeSlotsSection.style.display = 'none';
-    lunchPeriodsSection.style.display = 'none';
-
-    if (type === 'timeslots') {
-      timeSlotsSection.style.display = 'block';
-    } else if (type === 'lunch') {
-      lunchPeriodsSection.style.display = 'block';
-    }
-  });
+btnLunchPeriods.addEventListener('click', () => {
+  scheduleType = "lunchPeriods";
+  btnLunchPeriods.classList.add('active');
+  btnTimeSlots.classList.remove('active');
+  lunchPeriodsSection.style.display = 'block';
+  timeSlotsSection.style.display = 'none';
 });
 
 // === Time Slot Add/Remove ===
