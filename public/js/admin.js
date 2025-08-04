@@ -132,81 +132,109 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   loadEvents();
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // Cache buttons and pages
-    const form = document.getElementById('createEventForm');
-    const pages = Array.from(document.querySelectorAll('.page'));
-    const progressSteps = Array.from(document.querySelectorAll('.progress-bar .step'));
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const submitBtn = document.getElementById('submitBtn');
-  
-    let currentPage = 0;
-  
-    function showPage(page) {
-      pages.forEach((p, i) => {
-        p.style.display = i === page ? 'block' : 'none';
-      });
-  
-      progressSteps.forEach((ps, i) => {
-        ps.classList.toggle('active', i === page);
-      });
-  
-      prevBtn.disabled = page === 0;
-      nextBtn.style.display = page === pages.length - 1 ? 'none' : 'inline-block';
-      submitBtn.style.display = page === pages.length - 1 ? 'inline-block' : 'none';
-  
-      if (page === pages.length - 1) {
-        showReview();
+  // === Multi-step Form ===
+  const form = document.getElementById('createEventForm');
+  const pages = Array.from(document.querySelectorAll('.page'));
+  const progressSteps = Array.from(document.querySelectorAll('.progress-bar .step'));
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const submitBtn = document.getElementById('submitBtn');
+
+  let currentPage = 0;
+
+  function showPage(page) {
+    console.log('Showing page:', page);
+
+    pages.forEach((p, i) => {
+      p.style.display = i === page ? 'block' : 'none';
+    });
+
+    progressSteps.forEach((ps, i) => {
+      ps.classList.toggle('active', i === page);
+    });
+
+    prevBtn.disabled = (page === 0);
+
+    if (page === pages.length - 1) {
+      nextBtn.style.display = 'none';
+      submitBtn.style.display = 'inline-block';
+    } else {
+      nextBtn.style.display = 'inline-block';
+      submitBtn.style.display = 'none';
+    }
+  }
+
+  function validatePage(page) {
+    const inputs = pages[page].querySelectorAll('input, textarea, select');
+    for (const input of inputs) {
+      if (!input.checkValidity()) {
+        input.reportValidity();
+        return false;
       }
     }
-  
-    function validatePage(page) {
-      // Validate inputs on current page
-      const inputs = pages[page].querySelectorAll('input, textarea, select');
-      for (const input of inputs) {
-        if (!input.checkValidity()) {
-          input.reportValidity();
+    if (page === 2) {
+      if (!scheduleType) {
+        alert('Please select a schedule type.');
+        return false;
+      }
+      if (scheduleType === "timeSlots" && timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
+        alert('Please add at least one time slot.');
+        return false;
+      }
+      if (scheduleType === "lunchPeriods") {
+        if (!lunch5aMax.value || !lunch5aHours.value || !lunch5bMax.value || !lunch5bHours.value) {
+          alert('Please fill in both lunch periods.');
           return false;
         }
       }
-      return true;
     }
-  
-    function showReview() {
-      const reviewDiv = document.getElementById('reviewContent');
-      const title = document.getElementById('title').value;
-      const location = document.getElementById('location').value;
-      const description = document.getElementById('description').value;
-      const contactName = document.getElementById('contactName').value;
-      const contactEmail = document.getElementById('contactEmail').value;
-      const date = document.getElementById('date').value;
-  
-      // Adjust this to include schedule info as needed
-  
-      reviewDiv.textContent = `Title: ${title}\nLocation: ${location}\nDescription: ${description}\nContact: ${contactName} (${contactEmail})\nDate: ${date}`;
+    return true;
+  }
+
+  function showReview() {
+    const reviewDiv = document.getElementById('reviewContent');
+    const title = document.getElementById('title').value;
+    const location = document.getElementById('location').value;
+    const description = document.getElementById('description').value;
+    const contactName = document.getElementById('contactName').value;
+    const contactEmail = document.getElementById('contactEmail').value;
+    const date = document.getElementById('date').value;
+
+    let review = `Title: ${title}\nLocation: ${location}\nDescription: ${description}\nContact: ${contactName} (${contactEmail})\nDate: ${date}\nSchedule Type: ${scheduleType}\n`;
+
+    if (scheduleType === "timeSlots") {
+      const slots = Array.from(document.querySelectorAll('.time-slot')).map((slot, i) => {
+        return `${i + 1}. ${slot.querySelector('.slot-time').value} — Max: ${slot.querySelector('.slot-maxSpots').value}, Hours: ${slot.querySelector('.slot-hours').value}`;
+      }).join('\n');
+      review += `Time Slots:\n${slots}`;
+    } else {
+      const lunchData = getLunchPeriodsData();
+      lunchData.forEach(lp => {
+        review += `${lp.time} — Max: ${lp.maxSpots}, Hours: ${lp.hours}\n`;
+      });
     }
-  
-    prevBtn.addEventListener('click', () => {
-      if (currentPage > 0) {
-        currentPage--;
-        showPage(currentPage);
+    reviewDiv.textContent = review;
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 0) {
+      currentPage--;
+      showPage(currentPage);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (!validatePage(currentPage)) return;
+    if (currentPage < pages.length - 1) {
+      currentPage++;
+      showPage(currentPage);
+      if (currentPage === pages.length - 1) {
+        showReview();
       }
-    });
-  
-    nextBtn.addEventListener('click', () => {
-      if (!validatePage(currentPage)) return;
-      if (currentPage < pages.length - 1) {
-        currentPage++;
-        showPage(currentPage);
-      }
-    });
-  
-    // Initial call to show first page
-    showPage(currentPage);
-  
-    // Other existing code like schedule type toggles, form submit, etc. remains unchanged...
-  });  
+    }
+  });
+
+  showPage(currentPage);
 
   // === Submit ===
   form.addEventListener('submit', e => {
@@ -332,6 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const thisDate = new Date(year, month, day);
       if (thisDate.toDateString() === selectedDate.toDateString()) {
         cell.classList.add('selected');
+        hiddenDateInput.value = selectedDate.toISOString().split('T')[0]; // Set hidden input value
       }
 
       cell.addEventListener('click', () => {
