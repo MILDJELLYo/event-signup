@@ -143,26 +143,37 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPage = 0;
 
   function showPage(page) {
-    console.log('Showing page:', page);
-
+    // Show the correct form page
     pages.forEach((p, i) => {
       p.style.display = i === page ? 'block' : 'none';
     });
-
+  
+    // Highlight progress step
     progressSteps.forEach((ps, i) => {
       ps.classList.toggle('active', i === page);
     });
-
-    prevBtn.disabled = (page === 0);
-
+  
+    // Control previous button
+    prevBtn.disabled = page === 0;
+  
+    // Always show nav buttons
+    nextBtn.style.display = 'inline-block';
+    submitBtn.style.display = 'inline-block';
+  
+    // Decide which one is active
     if (page === pages.length - 1) {
-      nextBtn.style.display = 'none';
-      submitBtn.style.display = 'inline-block';
+      nextBtn.style.visibility = 'hidden';   // Hide visually but keep space
+      submitBtn.style.visibility = 'visible';
     } else {
-      nextBtn.style.display = 'inline-block';
-      submitBtn.style.display = 'none';
+      nextBtn.style.visibility = 'visible';
+      submitBtn.style.visibility = 'hidden';
     }
-  }
+  
+    // Populate review step
+    if (page === pages.length - 1) {
+      showReview();
+    }
+  }  
 
   function validatePage(page) {
     const inputs = pages[page].querySelectorAll('input, textarea, select');
