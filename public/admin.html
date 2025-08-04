@@ -132,34 +132,38 @@
         <div class="page" data-page="3" style="display:none;">
          <h3>Step 3: Choose Schedule Type</h3>
          
-         <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-          <button type="button" id="btnTimeSlots" class="schedule-type-btn">Time Slots</button>
-          <button type="button" id="btnLunchPeriods" class="schedule-type-btn">Lunch Periods</button>
+         <div class="form-group">
+          <label>Select Schedule Type</label>
+          <div class="schedule-type-container">
+            <button type="button" id="btnTimeSlots" class="schedule-type-btn">Time Slots</button>
+            <button type="button" id="btnLunchPeriods" class="schedule-type-btn">Lunch Periods</button>
+          </div>
         </div>
         
         <!-- Time Slots Section -->
-        <div id="timeSlotsSection" style="display:none;">
+        <div id="timeSlotsSection" style="display: none;">
           <div id="timeSlotsContainer"></div>
-          <div style="margin-top:1rem;">
-            <button type="button" id="addSlotBtn">Add Time Slot</button>
-            <button type="button" id="removeSlotBtn" style="margin-left:10px; background: #dc2626; color:white; border:none; padding: 5px 10px; border-radius: 4px;">Remove Last Slot</button>
-          </div>
+          <button type="button" id="addSlotBtn">Add Time Slot</button>
+          <button type="button" id="removeSlotBtn">Remove Last Slot</button>
         </div>
-
+        
         <!-- Lunch Periods Section -->
-        <div id="lunchPeriodsSection" style="display:none;">
-          <h4>5A Lunch</h4>
-          <label>Max Spots</label>
-          <input type="number" id="lunch5aMax" min="1" required />
-          <label>Service Hours</label>
-          <input type="number" id="lunch5aHours" min="1" required />
-          
-          <h4>5B Lunch</h4>
-          <label>Max Spots</label>
-          <input type="number" id="lunch5bMax" min="1" required />
-          <label>Service Hours</label>
-          <input type="number" id="lunch5bHours" min="1" required />
-        </div>
+        <div id="lunchPeriodsSection" style="display: none;">
+          <div>
+            <h4>5A Lunch</h4>
+            <label>Max Spots</label>
+            <input type="number" id="lunch5aMax" min="1" required>
+            <label>Service Hours</label>
+            <input type="number" id="lunch5aHours" min="1" required>
+          </div>
+          <div>
+            <h4>5B Lunch</h4>
+            <label>Max Spots</label>
+            <input type="number" id="lunch5bMax" min="1" required>
+            <label>Service Hours</label>
+            <input type="number" id="lunch5bHours" min="1" required>
+          </div>
+        </div>        
 
         <!-- Step 4: Review -->
         <div class="page" data-page="4" style="display:none;">
