@@ -162,7 +162,6 @@ prevBtn.addEventListener('click', () => {
 });
 
 nextBtn.addEventListener('click', () => {
-  // Validate current step inputs before moving on
   if (!validateStep(currentStep)) return;
 
   if (currentStep < steps.length - 1) {
@@ -187,6 +186,13 @@ function validateStep(step) {
       return false;
     }
   }
+  // For date step, check if a date is selected
+  if (step === 1) {
+    if (!document.getElementById('date').value) {
+      alert('Please select a date.');
+      return false;
+    }
+  }
   return true;
 }
 
@@ -196,7 +202,6 @@ showStep(currentStep);
 form.addEventListener('submit', e => {
   e.preventDefault();
 
-  // Final validation
   if (!validateStep(currentStep)) return;
 
   const title = document.getElementById('title').value.trim();
@@ -237,7 +242,140 @@ form.addEventListener('submit', e => {
       currentStep = 0;
       showStep(currentStep);
       document.getElementById('createModal').style.display = 'none';
-      loadEvents(); // refresh admin events list
+      loadEvents();
     })
     .catch(err => alert(err.error || 'Error creating event'));
 });
+
+/* === Custom Calendar UI === */
+
+const calendarElement = document.getElementById('calendar');
+const hiddenDateInput = document.getElementById('date');
+
+let today = new Date();
+let selectedDate = null;
+let calendarMonth = today.getMonth();
+let calendarYear = today.getFullYear();
+
+function renderCalendar(month, year) {
+  calendarElement.innerHTML = '';
+
+  // Header with month and year and nav buttons
+  const header = document.createElement('div');
+  header.classList.add('calendar-header');
+
+  const prevBtn = document.createElement('button');
+  prevBtn.textContent = '<';
+  prevBtn.addEventListener('click', () => {
+    calendarMonth--;
+    if (calendarMonth < 0) {
+      calendarMonth = 11;
+      calendarYear--;
+    }
+    renderCalendar(calendarMonth, calendarYear);
+  });
+
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = '>';
+  nextBtn.addEventListener('click', () => {
+    calendarMonth++;
+    if (calendarMonth > 11) {
+      calendarMonth = 0;
+      calendarYear++;
+    }
+    renderCalendar(calendarMonth, calendarYear);
+  });
+
+  const monthYear = document.createElement('div');
+  monthYear.textContent = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  header.appendChild(prevBtn);
+  header.appendChild(monthYear);
+  header.appendChild(nextBtn);
+
+  calendarElement.appendChild(header);
+
+  // Weekdays
+  const weekdays = document.createElement('div');
+  weekdays.classList.add('calendar-weekdays');
+  ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+    const d = document.createElement('div');
+    d.textContent = day;
+    weekdays.appendChild(d);
+  });
+  calendarElement.appendChild(weekdays);
+
+  // Days
+  const days = document.createElement('div');
+  days.classList.add('calendar-days');
+
+  // First day of month (0=Sun..6=Sat)
+  const firstDayIndex = new Date(year, month, 1).getDay();
+
+  // Days in month
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  // Fill blank days before first day
+  for (let i = 0; i < firstDayIndex; i++) {
+    const blank = document.createElement('div');
+    blank.classList.add('calendar-day', 'disabled');
+    days.appendChild(blank);
+  }
+
+  // Fill days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const day = document.createElement('div');
+    day.classList.add('calendar-day');
+    day.textContent = d;
+
+    const thisDate = new Date(year, month, d);
+
+    // Disable past days before today
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (thisDate < todayOnly) {
+      day.classList.add('disabled');
+    } else {
+      day.addEventListener('click', () => {
+        selectedDate = thisDate;
+        hiddenDateInput.value = selectedDate.toISOString().split('T')[0]; // yyyy-mm-dd format
+        highlightSelectedDate();
+      });
+    }
+
+    days.appendChild(day);
+  }
+
+  calendarElement.appendChild(days);
+  highlightSelectedDate();
+}
+
+function highlightSelectedDate() {
+  const dayElements = calendarElement.querySelectorAll('.calendar-day');
+  dayElements.forEach(dayEl => {
+    dayEl.classList.remove('selected');
+  });
+
+  if (!selectedDate) return;
+
+  // Only highlight if calendar is showing the month & year of selectedDate
+  if (selectedDate.getMonth() !== calendarMonth || selectedDate.getFullYear() !== calendarYear) return;
+
+  // Find the day element that matches selectedDate date number
+  const dayNumber = selectedDate.getDate();
+
+  // The days start after firstDayIndex disabled days, so index of dayNumber is firstDayIndex + dayNumber - 1
+  const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
+  const dayIndex = firstDayIndex + dayNumber - 1;
+  const dayElementsArr = Array.from(calendarElement.querySelectorAll('.calendar-day'));
+
+  if (dayElementsArr[dayIndex]) {
+    dayElementsArr[dayIndex].classList.add('selected');
+  }
+}
+
+// Initialize calendar with today's date selected by default
+selectedDate = today;
+calendarMonth = today.getMonth();
+calendarYear = today.getFullYear();
+hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
+renderCalendar(calendarMonth, calendarYear);
