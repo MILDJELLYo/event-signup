@@ -19,7 +19,28 @@ window.addEventListener('click', e => {
   }
 });
 
-// Time slot add/remove
+// === Schedule Type Handling ===
+const scheduleTypeButtons = document.querySelectorAll('.schedule-type-btn');
+const timeSlotsSection = document.getElementById('timeSlotsSection');
+const lunchPeriodsSection = document.getElementById('lunchPeriodsSection');
+
+scheduleTypeButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const type = btn.dataset.type;
+
+    // Hide both sections first
+    timeSlotsSection.style.display = 'none';
+    lunchPeriodsSection.style.display = 'none';
+
+    if (type === 'timeslots') {
+      timeSlotsSection.style.display = 'block';
+    } else if (type === 'lunch') {
+      lunchPeriodsSection.style.display = 'block';
+    }
+  });
+});
+
+// === Time Slot Add/Remove ===
 const addSlotBtn = document.getElementById('addSlotBtn');
 const removeSlotBtn = document.getElementById('removeSlotBtn');
 const timeSlotsContainer = document.getElementById('timeSlotsContainer');
@@ -38,6 +59,36 @@ addSlotBtn.addEventListener('click', () => {
   `;
   timeSlotsContainer.appendChild(slotDiv);
 });
+
+removeSlotBtn.addEventListener('click', () => {
+  const slots = timeSlotsContainer.querySelectorAll('.time-slot');
+  if (slots.length > 0) {
+    timeSlotsContainer.removeChild(slots[slots.length - 1]);
+  }
+});
+
+// === Lunch Period Handling ===
+const lunch5aMax = document.getElementById('lunch5aMax');
+const lunch5aHours = document.getElementById('lunch5aHours');
+const lunch5bMax = document.getElementById('lunch5bMax');
+const lunch5bHours = document.getElementById('lunch5bHours');
+
+function getLunchPeriodsData() {
+  return [
+    {
+      period: '5A',
+      maxSpots: parseInt(lunch5aMax.value, 10),
+      hours: parseInt(lunch5aHours.value, 10),
+      signups: []
+    },
+    {
+      period: '5B',
+      maxSpots: parseInt(lunch5bMax.value, 10),
+      hours: parseInt(lunch5bHours.value, 10),
+      signups: []
+    }
+  ];
+}
 
 removeSlotBtn.addEventListener('click', () => {
   const slots = timeSlotsContainer.querySelectorAll('.time-slot');
