@@ -1,122 +1,57 @@
-// Step elements
-const stepDetails = document.getElementById('step-details');
-const stepDate = document.getElementById('step-date');
-const stepSlots = document.getElementById('step-slots');
-
-const createModal = document.getElementById('createModal');
-const eventsList = document.getElementById('eventsList');
-
-let editingEventId = null; // Track editing state
-
-// Open create modal and reset form
+// Modal open/close
 document.getElementById('createBtn').addEventListener('click', () => {
-  createModal.style.display = 'flex';
-  showStep('details');
-  resetForm();
+  document.getElementById('createModal').style.display = 'flex';
 });
-
-// Close create modal
 document.getElementById('closeCreateModal').addEventListener('click', () => {
-  createModal.style.display = 'none';
+  document.getElementById('createModal').style.display = 'none';
 });
-
-// Click outside modal closes it
 window.addEventListener('click', e => {
-  if (e.target === createModal) {
-    createModal.style.display = 'none';
+  if (e.target === document.getElementById('createModal')) {
+    document.getElementById('createModal').style.display = 'none';
+  }
+});
+document.getElementById('closeSignupsModal').addEventListener('click', () => {
+  document.getElementById('signupsModal').style.display = 'none';
+});
+window.addEventListener('click', e => {
+  if (e.target === document.getElementById('signupsModal')) {
+    document.getElementById('signupsModal').style.display = 'none';
   }
 });
 
-// Show/hide steps
-function showStep(step) {
-  stepDetails.style.display = 'none';
-  stepDate.style.display = 'none';
-  stepSlots.style.display = 'none';
+// Time slot add/remove
+const addSlotBtn = document.getElementById('addSlotBtn');
+const removeSlotBtn = document.getElementById('removeSlotBtn');
+const timeSlotsContainer = document.getElementById('timeSlotsContainer');
 
-  if (step === 'details') stepDetails.style.display = 'block';
-  else if (step === 'date') stepDate.style.display = 'block';
-  else if (step === 'slots') stepSlots.style.display = 'block';
-}
-
-// Navigation buttons between steps
-document.getElementById('nextToDate').addEventListener('click', () => {
-  if (!validateDetailsStep()) return;
-  showStep('date');
-});
-
-document.getElementById('backToDetails').addEventListener('click', () => {
-  showStep('details');
-});
-
-document.getElementById('nextToSlots').addEventListener('click', () => {
-  if (!validateDateStep()) return;
-  showStep('slots');
-});
-
-document.getElementById('backToDate').addEventListener('click', () => {
-  showStep('date');
-});
-
-// Validate details step fields
-function validateDetailsStep() {
-  const title = document.getElementById('title').value.trim();
-  const location = document.getElementById('location').value.trim();
-  const description = document.getElementById('description').value.trim();
-  const contactName = document.getElementById('contactName').value.trim();
-  const contactEmail = document.getElementById('contactEmail').value.trim();
-
-  if (!title || !location || !description || !contactName || !contactEmail) {
-    alert('Please fill out all event details.');
-    return false;
-  }
-  return true;
-}
-
-// Validate date step field
-function validateDateStep() {
-  const date = document.getElementById('date').value.trim();
-  if (!date) {
-    alert('Please select a date.');
-    return false;
-  }
-  return true;
-}
-
-// Add and remove time slot buttons
-document.getElementById('addSlotBtn').addEventListener('click', () => {
-  addTimeSlot();
-});
-
-document.getElementById('removeSlotBtn').addEventListener('click', () => {
-  const container = document.getElementById('timeSlotsContainer');
-  const slots = container.querySelectorAll('.time-slot');
-  if (slots.length > 0) {
-    container.removeChild(slots[slots.length - 1]);
-  }
-});
-
-// Function to add a time slot input group
-function addTimeSlot(slot = null) {
-  const container = document.getElementById('timeSlotsContainer');
+addSlotBtn.addEventListener('click', () => {
   const slotDiv = document.createElement('div');
   slotDiv.classList.add('time-slot');
   slotDiv.style.marginBottom = '1rem';
   slotDiv.innerHTML = `
     <label>Time</label>
-    <input type="time" class="slot-time" required value="${slot ? slot.time : ''}" />
+    <input type="time" class="slot-time" required />
     <label>Max Spots</label>
-    <input type="number" class="slot-maxSpots" min="1" required value="${slot ? slot.maxSpots : ''}" />
+    <input type="number" class="slot-maxSpots" min="1" required />
     <label>Service Hours</label>
-    <input type="number" class="slot-hours" min="1" required value="${slot ? slot.hours : ''}" />
+    <input type="number" class="slot-hours" min="1" required />
   `;
-  container.appendChild(slotDiv);
-}
+  timeSlotsContainer.appendChild(slotDiv);
+});
 
-// Load events and render admin list
+removeSlotBtn.addEventListener('click', () => {
+  const slots = timeSlotsContainer.querySelectorAll('.time-slot');
+  if (slots.length > 0) {
+    timeSlotsContainer.removeChild(slots[slots.length - 1]);
+  }
+});
+
+// Load events into admin list
 function loadEvents() {
   fetch('/api/events')
     .then(res => res.json())
     .then(events => {
+      const eventsList = document.getElementById('eventsList');
       eventsList.innerHTML = '';
 
       events.forEach(event => {
@@ -132,96 +67,137 @@ function loadEvents() {
         eventsList.appendChild(eventCard);
       });
 
-      // Attach event handlers
-      attachEventHandlers();
+      // View signups button click
+      document.querySelectorAll('.viewSignupsBtn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = e.target.dataset.id;
+          fetch(`/api/events/${id}`)
+            .then(res => res.json())
+            .then(event => {
+              document.getElementById('signupsTitle').textContent = `Sign-Ups for ${event.title}`;
+              const container = document.getElementById('signupsContent');
+              container.innerHTML = '';
+              event.timeSlots.forEach(slot => {
+                container.innerHTML += `
+                  <h3>${slot.time} — ${slot.signups.length} / ${slot.maxSpots}</h3>
+                  <ul>
+                    ${slot.signups.map(name => `<li>${name}</li>`).join('')}
+                  </ul>
+                `;
+              });
+              document.getElementById('signupsModal').style.display = 'flex';
+            });
+        });
+      });
+
+      // TODO: Add edit and delete handlers as needed
     });
 }
+loadEvents();
 
-// Attach buttons inside event cards
-function attachEventHandlers() {
-  // View signups
-  document.querySelectorAll('.viewSignupsBtn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const id = e.target.dataset.id;
-      fetch(`/api/events/${id}`)
-        .then(res => res.json())
-        .then(event => {
-          document.getElementById('signupsTitle').textContent = `Sign-Ups for ${event.title}`;
-          const container = document.getElementById('signupsContent');
-          container.innerHTML = '';
-          event.timeSlots.forEach(slot => {
-            container.innerHTML += `
-              <h3>${slot.time} — ${slot.signups.length} / ${slot.maxSpots}</h3>
-              <ul>
-                ${slot.signups.map(name => `<li>${name}</li>`).join('')}
-              </ul>
-            `;
-          });
-          document.getElementById('signupsModal').style.display = 'flex';
-        });
-    });
+// Multi-step form handling
+const form = document.getElementById('createEventForm');
+const steps = Array.from(document.querySelectorAll('.step-content'));
+const progressSteps = Array.from(document.querySelectorAll('.progress-bar .step'));
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const submitBtn = document.getElementById('submitBtn');
+
+let currentStep = 0;
+
+function showStep(step) {
+  steps.forEach((s, i) => {
+    s.classList.toggle('active', i === step);
+  });
+  progressSteps.forEach((ps, i) => {
+    ps.classList.toggle('active', i === step);
   });
 
-  // Edit event
-  document.querySelectorAll('.editBtn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const id = e.target.dataset.id;
-      fetch(`/api/events/${id}`)
-        .then(res => res.json())
-        .then(event => {
-          editingEventId = id;
-          createModal.style.display = 'flex';
-          showStep('details');
+  prevBtn.disabled = step === 0;
+  nextBtn.style.display = step === steps.length - 1 ? 'none' : 'inline-block';
+  submitBtn.style.display = step === steps.length - 1 ? 'inline-block' : 'none';
 
-          // Prefill form fields
-          document.getElementById('title').value = event.title;
-          document.getElementById('date').value = event.date.split('T')[0];
-          document.getElementById('location').value = event.location;
-          document.getElementById('description').value = event.description;
-          document.getElementById('contactName').value = event.contactName;
-          document.getElementById('contactEmail').value = event.contactEmail;
-
-          // Clear and add time slots
-          const container = document.getElementById('timeSlotsContainer');
-          container.innerHTML = '';
-          event.timeSlots.forEach(slot => addTimeSlot(slot));
-
-          // Switch button text to Update
-          document.getElementById('createEventSubmit').textContent = 'Update Event';
-        });
-    });
-  });
-
-  // Delete event
-  document.querySelectorAll('.deleteBtn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const id = e.target.dataset.id;
-      if (!confirm('Are you sure you want to delete this event?')) return;
-      fetch(`/api/events/${id}`, { method: 'DELETE' })
-        .then(res => {
-          if (!res.ok) throw new Error('Delete failed');
-          loadEvents();
-        })
-        .catch(() => alert('Error deleting event'));
-    });
-  });
+  if (step === steps.length - 1) {
+    showReview();
+  }
 }
 
-// Close signups modal
-document.getElementById('closeSignupsModal').addEventListener('click', () => {
-  document.getElementById('signupsModal').style.display = 'none';
-});
+function showReview() {
+  const reviewDiv = document.getElementById('reviewContent');
+  const title = document.getElementById('title').value.trim();
+  const location = document.getElementById('location').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const contactName = document.getElementById('contactName').value.trim();
+  const contactEmail = document.getElementById('contactEmail').value.trim();
+  const date = document.getElementById('date').value.trim();
 
-// Click outside signups modal closes it
-window.addEventListener('click', e => {
-  if (e.target === document.getElementById('signupsModal')) {
-    document.getElementById('signupsModal').style.display = 'none';
+  const timeSlots = Array.from(document.querySelectorAll('.time-slot')).map(slotEl => ({
+    time: slotEl.querySelector('.slot-time').value.trim(),
+    maxSpots: slotEl.querySelector('.slot-maxSpots').value.trim(),
+    hours: slotEl.querySelector('.slot-hours').value.trim()
+  }));
+
+  let reviewText = `
+Title: ${title}
+Location: ${location}
+Description: ${description}
+Contact: ${contactName} (${contactEmail})
+Date: ${date}
+
+Time Slots:
+`;
+
+  timeSlots.forEach((slot, i) => {
+    reviewText += `  ${i + 1}. Time: ${slot.time}, Max Spots: ${slot.maxSpots}, Service Hours: ${slot.hours}\n`;
+  });
+
+  reviewDiv.textContent = reviewText;
+}
+
+prevBtn.addEventListener('click', () => {
+  if (currentStep > 0) {
+    currentStep--;
+    showStep(currentStep);
   }
 });
 
-// Handle create/update event submission
-document.getElementById('createEventForm').addEventListener('submit', e => {
+nextBtn.addEventListener('click', () => {
+  // Validate current step inputs before moving on
+  if (!validateStep(currentStep)) return;
+
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  }
+});
+
+function validateStep(step) {
+  const inputs = steps[step].querySelectorAll('input, textarea');
+  for (const input of inputs) {
+    if (!input.checkValidity()) {
+      input.reportValidity();
+      return false;
+    }
+  }
+  // Extra validation for time slots if step 3
+  if (step === 2) {
+    const slots = timeSlotsContainer.querySelectorAll('.time-slot');
+    if (slots.length === 0) {
+      alert('Please add at least one time slot.');
+      return false;
+    }
+  }
+  return true;
+}
+
+showStep(currentStep);
+
+// Handle event creation submit
+form.addEventListener('submit', e => {
   e.preventDefault();
+
+  // Final validation
+  if (!validateStep(currentStep)) return;
 
   const title = document.getElementById('title').value.trim();
   const date = document.getElementById('date').value.trim();
@@ -237,21 +213,8 @@ document.getElementById('createEventForm').addEventListener('submit', e => {
     signups: []
   }));
 
-  if (!title || !date || !location || !description || !contactName || !contactEmail) {
-    alert('Please fill in all fields');
-    return;
-  }
-
-  if (timeSlots.length === 0) {
-    alert('Please add at least one time slot.');
-    return;
-  }
-
-  const url = editingEventId ? `/api/events/${editingEventId}` : '/api/events';
-  const method = editingEventId ? 'PUT' : 'POST';
-
-  fetch(url, {
-    method,
+  fetch('/api/events', {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       title,
@@ -268,22 +231,13 @@ document.getElementById('createEventForm').addEventListener('submit', e => {
       return res.json();
     })
     .then(() => {
-      alert(editingEventId ? 'Event updated successfully!' : 'Event created successfully!');
-      createModal.style.display = 'none';
-      loadEvents();
-      resetForm();
-      editingEventId = null;
-      document.getElementById('createEventSubmit').textContent = 'Create Event';
-      showStep('details');
+      alert('Event created successfully!');
+      form.reset();
+      timeSlotsContainer.innerHTML = '';
+      currentStep = 0;
+      showStep(currentStep);
+      document.getElementById('createModal').style.display = 'none';
+      loadEvents(); // refresh admin events list
     })
-    .catch(err => alert(err.error || (editingEventId ? 'Error updating event' : 'Error creating event')));
+    .catch(err => alert(err.error || 'Error creating event'));
 });
-
-// Reset form helper
-function resetForm() {
-  document.getElementById('createEventForm').reset();
-  document.getElementById('timeSlotsContainer').innerHTML = '';
-}
-
-// Initial load
-loadEvents();
