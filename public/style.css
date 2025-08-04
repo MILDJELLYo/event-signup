@@ -239,3 +239,25 @@ textarea {
   color: #cbd5e1;
   cursor: default;
 }
+
+.schedule-type-btn {
+  flex: 1;
+  background: #dc2626; /* Memorial red */
+  color: white;
+  font-size: 1.2rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.schedule-type-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+}
+
+.schedule-type-btn.active {
+  outline: 4px solid #b91c1c;
+  background: #ef4444;
+}

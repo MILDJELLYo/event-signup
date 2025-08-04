@@ -46,7 +46,31 @@ removeSlotBtn.addEventListener('click', () => {
   }
 });
 
-// Load events into admin list
+// Schedule type selection
+let scheduleType = "";
+const btnTimeSlots = document.getElementById('btnTimeSlots');
+const btnLunchPeriods = document.getElementById('btnLunchPeriods');
+const timeSlotsSection = document.getElementById('timeSlotsSection');
+const lunchPeriodSection = document.getElementById('lunchPeriodSection');
+const lunchPeriodSelect = document.getElementById('lunchPeriod');
+
+btnTimeSlots.addEventListener('click', () => {
+  scheduleType = "timeSlots";
+  btnTimeSlots.classList.add('active');
+  btnLunchPeriods.classList.remove('active');
+  timeSlotsSection.style.display = 'block';
+  lunchPeriodSection.style.display = 'none';
+});
+
+btnLunchPeriods.addEventListener('click', () => {
+  scheduleType = "lunchPeriods";
+  btnLunchPeriods.classList.add('active');
+  btnTimeSlots.classList.remove('active');
+  lunchPeriodSection.style.display = 'block';
+  timeSlotsSection.style.display = 'none';
+});
+
+// Load events
 function loadEvents() {
   fetch('/api/events')
     .then(res => res.json())
@@ -59,10 +83,8 @@ function loadEvents() {
         eventCard.classList.add('event-card');
         eventCard.innerHTML = `
           <h2>${event.title}</h2>
-          <p>${new Date(event.date).toLocaleDateString('en-US')} • Spots Left: ${event.timeSlots.reduce((acc, slot) => acc + (slot.maxSpots - slot.signups.length), 0)}</p>
+          <p>${new Date(event.date).toLocaleDateString('en-US')}</p>
           <button class="viewSignupsBtn" data-id="${event.id}">View Sign-Ups</button>
-          <button class="editBtn" data-id="${event.id}">Edit</button>
-          <button class="deleteBtn" data-id="${event.id}" style="background:#dc2626;">Delete</button>
         `;
         eventsList.appendChild(eventCard);
       });
@@ -76,14 +98,6 @@ function loadEvents() {
               document.getElementById('signupsTitle').textContent = `Sign-Ups for ${event.title}`;
               const container = document.getElementById('signupsContent');
               container.innerHTML = '';
-              event.timeSlots.forEach(slot => {
-                container.innerHTML += `
-                  <h3>${slot.time} — ${slot.signups.length} / ${slot.maxSpots}</h3>
-                  <ul>
-                    ${slot.signups.map(name => `<li>${name}</li>`).join('')}
-                  </ul>
-                `;
-              });
               document.getElementById('signupsModal').style.display = 'flex';
             });
         });
@@ -92,83 +106,76 @@ function loadEvents() {
 }
 loadEvents();
 
-/* === Multi-step Form Navigation === */
+// Multi-step form
 const form = document.getElementById('createEventForm');
 const pages = Array.from(document.querySelectorAll('.page'));
 const progressSteps = Array.from(document.querySelectorAll('.progress-bar .step'));
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const submitBtn = document.getElementById('submitBtn');
-const hiddenDateInput = document.getElementById('date');
 
 let currentPage = 0;
 
-function showPage(pageIndex) {
-  pages.forEach((page, i) => {
-    page.style.display = i === pageIndex ? 'block' : 'none';
+function showPage(page) {
+  pages.forEach((p, i) => {
+    p.style.display = i === page ? 'block' : 'none';
+  });
+  progressSteps.forEach((ps, i) => {
+    ps.classList.toggle('active', i === page);
   });
 
-  progressSteps.forEach((step, i) => {
-    step.classList.toggle('active', i === pageIndex);
-  });
+  prevBtn.disabled = page === 0;
+  nextBtn.style.display = page === pages.length - 1 ? 'none' : 'inline-block';
+  submitBtn.style.display = page === pages.length - 1 ? 'inline-block' : 'none';
 
-  prevBtn.disabled = pageIndex === 0;
-  nextBtn.style.display = pageIndex === pages.length - 1 ? 'none' : 'inline-block';
-  submitBtn.style.display = pageIndex === pages.length - 1 ? 'inline-block' : 'none';
+  if (page === pages.length - 1) showReview();
 }
 
-function validatePage(pageIndex) {
-  const inputs = pages[pageIndex].querySelectorAll('input, textarea');
+function validatePage(page) {
+  const inputs = pages[page].querySelectorAll('input, textarea, select');
   for (const input of inputs) {
     if (!input.checkValidity()) {
       input.reportValidity();
       return false;
     }
   }
-  if (pageIndex === 2) {
-    if (timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
+  if (page === 2) {
+    if (!scheduleType) {
+      alert('Please select a schedule type.');
+      return false;
+    }
+    if (scheduleType === "timeSlots" && timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
       alert('Please add at least one time slot.');
       return false;
     }
-  }
-  if (pageIndex === 1) {
-    if (!hiddenDateInput.value) {
-      alert('Please select a date.');
+    if (scheduleType === "lunchPeriods" && !lunchPeriodSelect.value) {
+      alert('Please select a lunch period.');
       return false;
     }
   }
   return true;
 }
 
-function updateReview() {
-  const reviewContent = document.getElementById('reviewContent');
-  const title = document.getElementById('title').value.trim();
-  const location = document.getElementById('location').value.trim();
-  const description = document.getElementById('description').value.trim();
-  const contactName = document.getElementById('contactName').value.trim();
-  const contactEmail = document.getElementById('contactEmail').value.trim();
-  const date = hiddenDateInput.value;
+function showReview() {
+  const reviewDiv = document.getElementById('reviewContent');
+  const title = document.getElementById('title').value;
+  const location = document.getElementById('location').value;
+  const description = document.getElementById('description').value;
+  const contactName = document.getElementById('contactName').value;
+  const contactEmail = document.getElementById('contactEmail').value;
+  const date = document.getElementById('date').value;
 
-  const timeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot')).map(slotEl => ({
-    time: slotEl.querySelector('.slot-time').value.trim(),
-    maxSpots: slotEl.querySelector('.slot-maxSpots').value.trim(),
-    hours: slotEl.querySelector('.slot-hours').value.trim()
-  }));
+  let review = `Title: ${title}\nLocation: ${location}\nDescription: ${description}\nContact: ${contactName} (${contactEmail})\nDate: ${date}\nSchedule Type: ${scheduleType}\n`;
 
-  let reviewText = `
-Title: ${title}
-Location: ${location}
-Description: ${description}
-Contact: ${contactName} (${contactEmail})
-Date: ${date}
-
-Time Slots:
-`;
-  timeSlots.forEach((slot, i) => {
-    reviewText += `  ${i + 1}. Time: ${slot.time}, Max Spots: ${slot.maxSpots}, Service Hours: ${slot.hours}\n`;
-  });
-
-  reviewContent.textContent = reviewText;
+  if (scheduleType === "timeSlots") {
+    const slots = Array.from(document.querySelectorAll('.time-slot')).map((slot, i) => {
+      return `${i + 1}. ${slot.querySelector('.slot-time').value} — Max: ${slot.querySelector('.slot-maxSpots').value}, Hours: ${slot.querySelector('.slot-hours').value}`;
+    }).join('\n');
+    review += `Time Slots:\n${slots}`;
+  } else {
+    review += `Lunch Period: ${lunchPeriodSelect.value}`;
+  }
+  reviewDiv.textContent = review;
 }
 
 prevBtn.addEventListener('click', () => {
@@ -182,29 +189,80 @@ nextBtn.addEventListener('click', () => {
   if (!validatePage(currentPage)) return;
   if (currentPage < pages.length - 1) {
     currentPage++;
-    if (currentPage === pages.length - 1) updateReview();
     showPage(currentPage);
   }
 });
 
 showPage(currentPage);
 
-/* === Custom Calendar UI === */
+// Submit
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  if (!validatePage(currentPage)) return;
+
+  const title = document.getElementById('title').value.trim();
+  const date = document.getElementById('date').value.trim();
+  const location = document.getElementById('location').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const contactName = document.getElementById('contactName').value.trim();
+  const contactEmail = document.getElementById('contactEmail').value.trim();
+
+  const payload = {
+    title,
+    date,
+    location,
+    description,
+    contactName,
+    contactEmail,
+    scheduleType
+  };
+
+  if (scheduleType === "timeSlots") {
+    payload.timeSlots = Array.from(document.querySelectorAll('.time-slot')).map(slotEl => ({
+      time: slotEl.querySelector('.slot-time').value.trim(),
+      maxSpots: parseInt(slotEl.querySelector('.slot-maxSpots').value, 10),
+      hours: parseInt(slotEl.querySelector('.slot-hours').value, 10),
+      signups: []
+    }));
+  } else if (scheduleType === "lunchPeriods") {
+    payload.lunchPeriod = lunchPeriodSelect.value;
+  }
+
+  fetch('/api/events', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(() => {
+      alert('Event created!');
+      form.reset();
+      timeSlotsContainer.innerHTML = '';
+      scheduleType = "";
+      currentPage = 0;
+      showPage(currentPage);
+      document.getElementById('createModal').style.display = 'none';
+      loadEvents();
+    })
+    .catch(() => alert('Error creating event.'));
+});
+
+// Calendar UI
+const calendarElement = document.getElementById('calendar');
+const hiddenDateInput = document.getElementById('date');
 let today = new Date();
 let selectedDate = today;
 let calendarMonth = today.getMonth();
 let calendarYear = today.getFullYear();
 
 function renderCalendar(month, year) {
-  const calendarElement = document.getElementById('calendar');
   calendarElement.innerHTML = '';
-
   const header = document.createElement('div');
   header.classList.add('calendar-header');
 
-  const prev = document.createElement('button');
-  prev.textContent = '<';
-  prev.addEventListener('click', () => {
+  const prevBtn = document.createElement('button');
+  prevBtn.textContent = '<';
+  prevBtn.addEventListener('click', () => {
     calendarMonth--;
     if (calendarMonth < 0) {
       calendarMonth = 11;
@@ -213,9 +271,9 @@ function renderCalendar(month, year) {
     renderCalendar(calendarMonth, calendarYear);
   });
 
-  const next = document.createElement('button');
-  next.textContent = '>';
-  next.addEventListener('click', () => {
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = '>';
+  nextBtn.addEventListener('click', () => {
     calendarMonth++;
     if (calendarMonth > 11) {
       calendarMonth = 0;
@@ -227,9 +285,9 @@ function renderCalendar(month, year) {
   const monthYear = document.createElement('div');
   monthYear.textContent = new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
 
-  header.appendChild(prev);
+  header.appendChild(prevBtn);
   header.appendChild(monthYear);
-  header.appendChild(next);
+  header.appendChild(nextBtn);
   calendarElement.appendChild(header);
 
   const weekdays = document.createElement('div');
@@ -241,106 +299,44 @@ function renderCalendar(month, year) {
   });
   calendarElement.appendChild(weekdays);
 
-  const days = document.createElement('div');
-  days.classList.add('calendar-days');
+  const daysGrid = document.createElement('div');
+  daysGrid.classList.add('calendar-days');
 
-  const firstDayIndex = new Date(year, month, 1).getDay();
+  const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  for (let i = 0; i < firstDayIndex; i++) {
-    const blank = document.createElement('div');
-    blank.classList.add('calendar-day', 'disabled');
-    days.appendChild(blank);
+  // Fill empty slots before the first day
+  for (let i = 0; i < firstDay; i++) {
+    const emptyCell = document.createElement('div');
+    emptyCell.classList.add('calendar-day', 'disabled');
+    daysGrid.appendChild(emptyCell);
   }
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const day = document.createElement('div');
-    day.classList.add('calendar-day');
-    day.textContent = d;
-    const thisDate = new Date(year, month, d);
+  // Fill actual days
+  for (let day = 1; day <= daysInMonth; day++) {
+    const cell = document.createElement('div');
+    cell.classList.add('calendar-day');
+    cell.textContent = day;
 
-    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    if (thisDate < todayOnly) {
-      day.classList.add('disabled');
-    } else {
-      day.addEventListener('click', () => {
-        selectedDate = thisDate;
-        hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
-        highlightSelectedDate();
-      });
+    const thisDate = new Date(year, month, day);
+    if (
+      thisDate.toDateString() === selectedDate.toDateString()
+    ) {
+      cell.classList.add('selected');
     }
 
-    days.appendChild(day);
+    cell.addEventListener('click', () => {
+      selectedDate = thisDate;
+      hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
+      renderCalendar(month, year);
+    });
+
+    daysGrid.appendChild(cell);
   }
 
-  calendarElement.appendChild(days);
-  highlightSelectedDate();
+  calendarElement.appendChild(daysGrid);
 }
 
-function highlightSelectedDate() {
-  const dayElements = document.querySelectorAll('.calendar-day');
-  dayElements.forEach(dayEl => {
-    dayEl.classList.remove('selected');
-  });
-
-  if (!selectedDate) return;
-  if (selectedDate.getMonth() !== calendarMonth || selectedDate.getFullYear() !== calendarYear) return;
-
-  const firstDayIndex = new Date(calendarYear, calendarMonth, 1).getDay();
-  const dayIndex = firstDayIndex + selectedDate.getDate() - 1;
-  const dayElementsArr = Array.from(document.querySelectorAll('.calendar-day'));
-  if (dayElementsArr[dayIndex]) {
-    dayElementsArr[dayIndex].classList.add('selected');
-  }
-}
-
-hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
+// Initial render
 renderCalendar(calendarMonth, calendarYear);
 
-// Handle event creation
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  if (!validatePage(currentPage)) return;
-
-  const title = document.getElementById('title').value.trim();
-  const date = hiddenDateInput.value.trim();
-  const location = document.getElementById('location').value.trim();
-  const description = document.getElementById('description').value.trim();
-  const contactName = document.getElementById('contactName').value.trim();
-  const contactEmail = document.getElementById('contactEmail').value.trim();
-
-  const timeSlots = Array.from(timeSlotsContainer.querySelectorAll('.time-slot')).map(slotEl => ({
-    time: slotEl.querySelector('.slot-time').value.trim(),
-    maxSpots: parseInt(slotEl.querySelector('.slot-maxSpots').value, 10),
-    hours: parseInt(slotEl.querySelector('.slot-hours').value, 10),
-    signups: []
-  }));
-
-  fetch('/api/events', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      title,
-      date,
-      location,
-      description,
-      contactName,
-      contactEmail,
-      timeSlots
-    })
-  })
-    .then(res => {
-      if (!res.ok) return res.json().then(err => Promise.reject(err));
-      return res.json();
-    })
-    .then(() => {
-      alert('Event created successfully!');
-      form.reset();
-      timeSlotsContainer.innerHTML = '';
-      currentPage = 0;
-      showPage(currentPage);
-      document.getElementById('createModal').style.display = 'none';
-      loadEvents();
-    })
-    .catch(err => alert(err.error || 'Error creating event'));
-});
