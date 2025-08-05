@@ -17,13 +17,7 @@ fetch(`/api/events/${eventId}`)
     // Build slot dropdown options for cancel modal
     let slotOptions = '';
     event.timeSlots.forEach((slot, index) => {
-      function isTimeFormat(timeStr) {
-        return /^\d{1,2}:\d{2}$/.test(timeStr);
-      }
-      
-      slotOptions += `<option value="${index}">${
-        isTimeFormat(slot.time) ? formatTime(slot.time) : slot.time
-      } (${slot.hours} Service Hours)</option>`;
+      slotOptions += `<option value="${index}">${slot.time} (${slot.hours} Service Hours)</option>`;
     });
 
     // Top event info + cancel button
@@ -37,48 +31,90 @@ fetch(`/api/events/${eventId}`)
         <p><strong>Contact:</strong> ${event.contactName} - <a href="mailto:${event.contactEmail}">${event.contactEmail}</a></p>
         <button id="openCancelModal" style="background:#dc2626; margin-top:1rem;">Cancel My Signup</button>
       </div>
-      <h2>Available Time Slots</h2>
+      <h2>Available Slots</h2>
     `;
 
-    // List time slots with signup forms & signup list
-    event.timeSlots.forEach((slot, index) => {
-      const spotsLeft = slot.maxSpots - slot.signups.length;
-      html += `
-        <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-          <p><strong>${
-            isTimeFormat(slot.time) ? formatTime(slot.time) : slot.time
-          }</strong></p>        
-          <p style="color: gray;">${slot.hours} Service Hours</p>
-          <p>Spots left: ${spotsLeft}</p>
-          ${
-            spotsLeft > 0
-              ? `
-              <form data-slot="${index}" class="signupForm">
-                <label for="firstName_${index}">First Name</label>
-                <input type="text" id="firstName_${index}" name="firstName" required>
-                <label for="lastName_${index}">Last Name</label>
-                <input type="text" id="lastName_${index}" name="lastName" required>
-                <button type="submit">Sign Up</button>
-              </form>`
-              : `<div style="color:red; font-weight:bold;">Full</div>`
-          }
-          <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
-            <thead>
-              <tr><th style="text-align:left; border-bottom: 1px solid #ccc;">Signed Up</th></tr>
-            </thead>
-            <tbody>
-              ${
-                slot.signups.length > 0
-                  ? slot.signups
-                      .map(name => `<tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${name}</td></tr>`)
-                      .join('')
-                  : '<tr><td>No sign-ups yet</td></tr>'
-              }
-            </tbody>
-          </table>
-        </div>
-      `;
-    });
+    // Render differently depending on scheduleType
+    if (event.scheduleType === "timeSlots") {
+      // Time Slots UI
+      event.timeSlots.forEach((slot, index) => {
+        const spotsLeft = slot.maxSpots - slot.signups.length;
+        html += `
+          <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <p><strong>${formatTime(slot.time)}</strong></p>
+            <p style="color: gray;">${slot.hours} Service Hours</p>
+            <p>Spots left: ${spotsLeft}</p>
+            ${
+              spotsLeft > 0
+                ? `
+                <form data-slot="${index}" class="signupForm">
+                  <label for="firstName_${index}">First Name</label>
+                  <input type="text" id="firstName_${index}" name="firstName" required>
+                  <label for="lastName_${index}">Last Name</label>
+                  <input type="text" id="lastName_${index}" name="lastName" required>
+                  <button type="submit">Sign Up</button>
+                </form>`
+                : `<div style="color:red; font-weight:bold;">Full</div>`
+            }
+            <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+              <thead>
+                <tr><th style="text-align:left; border-bottom: 1px solid #ccc;">Signed Up</th></tr>
+              </thead>
+              <tbody>
+                ${
+                  slot.signups.length > 0
+                    ? slot.signups
+                        .map(name => `<tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${name}</td></tr>`)
+                        .join('')
+                    : '<tr><td>No sign-ups yet</td></tr>'
+                }
+              </tbody>
+            </table>
+          </div>
+        `;
+      });
+    } else if (event.scheduleType === "lunchPeriods") {
+      // Lunch Periods UI (simpler)
+      event.timeSlots.forEach((slot, index) => {
+        const spotsLeft = slot.maxSpots - slot.signups.length;
+        html += `
+          <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <h3>${slot.time}</h3>
+            <p>Max Spots: ${slot.maxSpots}</p>
+            <p>Service Hours: ${slot.hours}</p>
+            <p>Spots left: ${spotsLeft}</p>
+            ${
+              spotsLeft > 0
+                ? `
+                <form data-slot="${index}" class="signupForm">
+                  <label for="firstName_${index}">First Name</label>
+                  <input type="text" id="firstName_${index}" name="firstName" required>
+                  <label for="lastName_${index}">Last Name</label>
+                  <input type="text" id="lastName_${index}" name="lastName" required>
+                  <button type="submit">Sign Up</button>
+                </form>`
+                : `<div style="color:red; font-weight:bold;">Full</div>`
+            }
+            <table style="width: 100%; margin-top: 1rem; border-collapse: collapse;">
+              <thead>
+                <tr><th style="text-align:left; border-bottom: 1px solid #ccc;">Signed Up</th></tr>
+              </thead>
+              <tbody>
+                ${
+                  slot.signups.length > 0
+                    ? slot.signups
+                        .map(name => `<tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${name}</td></tr>`)
+                        .join('')
+                    : '<tr><td>No sign-ups yet</td></tr>'
+                }
+              </tbody>
+            </table>
+          </div>
+        `;
+      });
+    } else {
+      html += `<p>Unknown schedule type.</p>`;
+    }
 
     container.innerHTML = html;
 

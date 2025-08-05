@@ -34,7 +34,7 @@ app.get('/api/events/:id', (req, res) => {
 
 // Create event with time slots
 app.post('/api/events', (req, res) => {
-  const { title, date, location, description, contactName, contactEmail, timeSlots } = req.body;
+  const { title, date, location, description, contactName, contactEmail, scheduleType, timeSlots } = req.body;
   const events = readEvents();
   const newEvent = {
     id: uuidv4(),
@@ -44,6 +44,7 @@ app.post('/api/events', (req, res) => {
     description,
     contactName,
     contactEmail,
+    scheduleType,  // <-- add this line to save scheduleType
     timeSlots: timeSlots.map(slot => ({
       time: slot.time,
       hours: slot.hours,
