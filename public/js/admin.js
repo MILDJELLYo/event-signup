@@ -35,21 +35,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnTimeSlots.addEventListener('click', () => {
     scheduleType = "timeSlots";
-    console.log("scheduleType set to:", scheduleType);
     btnTimeSlots.classList.add('active');
     btnLunchPeriods.classList.remove('active');
     timeSlotsSection.style.display = 'block';
     lunchPeriodsSection.style.display = 'none';
+  
+    // If there are no slots yet, auto-add one
+    if (timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
+      addTimeSlot();
+    }
   });
-
-  btnLunchPeriods.addEventListener('click', () => {
-    scheduleType = "lunchPeriods";
-    console.log("scheduleType set to:", scheduleType);
-    btnLunchPeriods.classList.add('active');
-    btnTimeSlots.classList.remove('active');
-    lunchPeriodsSection.style.display = 'block';
-    timeSlotsSection.style.display = 'none';
-  });
+  
+  function addTimeSlot() {
+    const slotDiv = document.createElement('div');
+    slotDiv.classList.add('time-slot');
+    slotDiv.style.marginBottom = '1rem';
+    slotDiv.innerHTML = `
+      <label>Time</label>
+      <input type="time" class="slot-time" required />
+      <label>Max Spots</label>
+      <input type="number" class="slot-maxSpots" min="1" required />
+      <label>Service Hours</label>
+      <input type="number" class="slot-hours" min="1" required />
+    `;
+    timeSlotsContainer.appendChild(slotDiv);
+  }
+  
+  addSlotBtn.addEventListener('click', addTimeSlot);  
 
   // === Time Slots Add/Remove ===
   const addSlotBtn = document.getElementById('addSlotBtn');
@@ -180,8 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }  
 
   function validatePage(page) {
-    console.log("Validating page", page, "with scheduleType:", scheduleType);
-
+    // Check required inputs on current page
     const inputs = pages[page].querySelectorAll('input, textarea, select');
     for (const input of inputs) {
       if (!input.checkValidity()) {
@@ -189,25 +200,41 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     }
-
-    if (page === 2) { // Step 3 schedule selection
+  
+    // Schedule page validation
+    if (page === 2) { 
       if (!scheduleType) {
-        alert('Please select a schedule type before proceeding.');
+        alert('Please select a schedule type.');
         return false;
       }
-      if (scheduleType === "timeSlots" && timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
-        alert('Please add at least one time slot.');
-        return false;
+  
+      if (scheduleType === "timeSlots") {
+        const slots = timeSlotsContainer.querySelectorAll('.time-slot');
+        if (slots.length === 0) {
+          alert('Please add at least one time slot.');
+          return false;
+        }
+        // Ensure all time slot inputs are filled
+        for (const slot of slots) {
+          const time = slot.querySelector('.slot-time');
+          const max = slot.querySelector('.slot-maxSpots');
+          const hours = slot.querySelector('.slot-hours');
+          if (!time.value || !max.value || !hours.value) {
+            alert('Please fill out all fields for each time slot.');
+            return false;
+          }
+        }
       }
+  
       if (scheduleType === "lunchPeriods") {
         if (!lunch5aMax.value || !lunch5aHours.value || !lunch5bMax.value || !lunch5bHours.value) {
-          alert('Please fill in all lunch period fields.');
+          alert('Please fill in both lunch periods.');
           return false;
         }
       }
     }
     return true;
-  }
+  }  
 
   function showReview() {
     const reviewDiv = document.getElementById('reviewContent');
