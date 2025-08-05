@@ -281,15 +281,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // === Submit ===
   form.addEventListener('submit', e => {
     e.preventDefault();
-    if (!validatePage(currentPage)) return;
-
+    console.log("Submit clicked, current page:", currentPage);
+    if (!validatePage(currentPage)) {
+      console.log("Validation failed on submit");
+      return;
+    }
+  
     const title = document.getElementById('title').value.trim();
     const date = document.getElementById('date').value.trim();
     const location = document.getElementById('location').value.trim();
     const description = document.getElementById('description').value.trim();
     const contactName = document.getElementById('contactName').value.trim();
     const contactEmail = document.getElementById('contactEmail').value.trim();
-
+  
     const payload = {
       title,
       date,
@@ -299,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
       contactEmail,
       scheduleType
     };
-
+  
     if (scheduleType === "timeSlots") {
       payload.timeSlots = Array.from(document.querySelectorAll('.time-slot')).map(slotEl => ({
         time: slotEl.querySelector('.slot-time').value.trim(),
@@ -310,15 +314,23 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (scheduleType === "lunchPeriods") {
       payload.timeSlots = getLunchPeriodsData();
     }
-
+  
+    console.log("Payload to send:", payload);
+  
     fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
-      .then(res => res.json())
-      .then(() => {
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then(data => {
         alert('Event created!');
+        console.log("Server response:", data);
         form.reset();
         timeSlotsContainer.innerHTML = '';
         scheduleType = "";
@@ -327,8 +339,11 @@ document.addEventListener('DOMContentLoaded', () => {
         createModal.style.display = 'none';
         loadEvents();
       })
-      .catch(() => alert('Error creating event.'));
-  });
+      .catch(err => {
+        alert('Error creating event: ' + err.message);
+        console.error("Create event error:", err);
+      });
+  });  
 
   // === Calendar UI ===
   const calendarElement = document.getElementById('calendar');
