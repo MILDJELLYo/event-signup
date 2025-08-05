@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   closeCreateModal.addEventListener('click', () => {
     createModal.style.display = 'none';
+    clearEditingState();
   });
 
   closeSignupsModal.addEventListener('click', () => {
@@ -20,7 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('click', e => {
-    if (e.target === createModal) createModal.style.display = 'none';
+    if (e.target === createModal) {
+      createModal.style.display = 'none';
+      clearEditingState();
+    }
     if (e.target === signupsModal) signupsModal.style.display = 'none';
   });
 
@@ -140,10 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
             <h2>${event.title}</h2>
             <p>${new Date(event.date).toLocaleDateString('en-US')}</p>
             <button class="viewSignupsBtn" data-id="${event.id}">View Sign-Ups</button>
+            <button class="editEventBtn" data-id="${event.id}">Edit</button>
+            <button class="deleteEventBtn" data-id="${event.id}">Delete</button>
           `;
           eventsList.appendChild(eventCard);
         });
 
+        // Add event listeners for the buttons
         document.querySelectorAll('.viewSignupsBtn').forEach(btn => {
           btn.addEventListener('click', e => {
             const id = e.target.dataset.id;
@@ -154,6 +161,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('signupsContent').innerHTML = '';
                 signupsModal.style.display = 'flex';
               });
+          });
+        });
+
+        document.querySelectorAll('.editEventBtn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            const id = e.target.dataset.id;
+            fetch(`/api/events/${id}`)
+              .then(res => res.json())
+              .then(event => {
+                openEditModal(event);
+              })
+              .catch(err => {
+                alert('Failed to load event for editing');
+                console.error(err);
+              });
+          });
+        });
+
+        document.querySelectorAll('.deleteEventBtn').forEach(btn => {
+          btn.addEventListener('click', e => {
+            const id = e.target.dataset.id;
+            if (confirm('Are you sure you want to delete this event?')) {
+              fetch(`/api/events/${id}`, { method: 'DELETE' })
+                .then(res => {
+                  if (!res.ok) throw new Error('Delete failed');
+                  alert('Event deleted');
+                  loadEvents();
+                })
+                .catch(err => {
+                  alert('Failed to delete event');
+                  console.error(err);
+                });
+            }
           });
         });
       });
@@ -326,10 +366,17 @@ document.addEventListener('DOMContentLoaded', () => {
       payload.timeSlots = getLunchPeriodsData();
     }
 
-    console.log("Payload to send:", payload);
+    const editingId = form.dataset.editingId;
+    let method = 'POST';
+    let url = '/api/events';
 
-    fetch('/api/events', {
-      method: 'POST',
+    if (editingId) {
+      method = 'PUT';
+      url = `/api/events/${editingId}`;
+    }
+
+    fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
@@ -340,8 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return res.json();
       })
       .then(data => {
-        alert('Event created!');
-        console.log("Server response:", data);
+        alert(editingId ? 'Event updated!' : 'Event created!');
         form.reset();
         timeSlotsContainer.innerHTML = '';
         scheduleType = "";
@@ -349,12 +395,92 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage(currentPage);
         createModal.style.display = 'none';
         loadEvents();
+
+        // Clear editing state
+        clearEditingState();
       })
       .catch(err => {
-        alert('Error creating event: ' + err.message);
-        console.error("Create event error:", err);
+        alert('Error saving event: ' + err.message);
+        console.error(err);
       });
   });
+
+  // === Edit modal population ===
+  function openEditModal(event) {
+    scheduleType = event.scheduleType || "";
+
+    form.reset();
+    timeSlotsContainer.innerHTML = '';
+    lunch5aMax.value = '';
+    lunch5aHours.value = '';
+    lunch5bMax.value = '';
+    lunch5bHours.value = '';
+
+    document.getElementById('title').value = event.title || '';
+    document.getElementById('date').value = event.date ? event.date.split('T')[0] : '';
+    document.getElementById('location').value = event.location || '';
+    document.getElementById('description').value = event.description || '';
+    document.getElementById('contactName').value = event.contactName || '';
+    document.getElementById('contactEmail').value = event.contactEmail || '';
+
+    if (scheduleType === "timeSlots") {
+      btnTimeSlots.classList.add('active');
+      btnLunchPeriods.classList.remove('active');
+      timeSlotsSection.style.display = 'block';
+      lunchPeriodsSection.style.display = 'none';
+
+      // Enable/disable inputs correctly
+      timeSlotsSection.querySelectorAll('input').forEach(input => input.disabled = false);
+      lunchPeriodsSection.querySelectorAll('input').forEach(input => input.disabled = true);
+
+      if (Array.isArray(event.timeSlots)) {
+        event.timeSlots.forEach(slot => {
+          addTimeSlot();
+          const slotDiv = timeSlotsContainer.lastChild;
+          slotDiv.querySelector('.slot-time').value = slot.time || '';
+          slotDiv.querySelector('.slot-maxSpots').value = slot.maxSpots || '';
+          slotDiv.querySelector('.slot-hours').value = slot.hours || '';
+        });
+      }
+    } else if (scheduleType === "lunchPeriods") {
+      btnLunchPeriods.classList.add('active');
+      btnTimeSlots.classList.remove('active');
+      lunchPeriodsSection.style.display = 'block';
+      timeSlotsSection.style.display = 'none';
+
+      // Enable/disable inputs correctly
+      lunchPeriodsSection.querySelectorAll('input').forEach(input => input.disabled = false);
+      timeSlotsSection.querySelectorAll('input').forEach(input => input.disabled = true);
+
+      if (Array.isArray(event.timeSlots)) {
+        const lunch5a = event.timeSlots.find(slot => slot.time === '5A Lunch');
+        const lunch5b = event.timeSlots.find(slot => slot.time === '5B Lunch');
+
+        if (lunch5a) {
+          lunch5aMax.value = lunch5a.maxSpots || '';
+          lunch5aHours.value = lunch5a.hours || '';
+        }
+        if (lunch5b) {
+          lunch5bMax.value = lunch5b.maxSpots || '';
+          lunch5bHours.value = lunch5b.hours || '';
+        }
+      }
+    }
+
+    currentPage = 0;
+    showPage(currentPage);
+    createModal.style.display = 'flex';
+
+    // Save editing ID on form
+    form.dataset.editingId = event.id;
+  }
+
+  function clearEditingState() {
+    delete form.dataset.editingId;
+    scheduleType = "";
+    btnTimeSlots.classList.remove('active');
+    btnLunchPeriods.classList.remove('active');
+  }
 
   // === Calendar UI ===
   const calendarElement = document.getElementById('calendar');
