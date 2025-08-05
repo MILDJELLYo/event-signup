@@ -24,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === signupsModal) signupsModal.style.display = 'none';
   });
 
+  // === Time Slots Add/Remove ===
+  const addSlotBtn = document.getElementById('addSlotBtn');
+  const removeSlotBtn = document.getElementById('removeSlotBtn');
+  const timeSlotsContainer = document.getElementById('timeSlotsContainer');
+
   // === Schedule Type Toggle ===
   let scheduleType = "";
   console.log("Initial scheduleType:", scheduleType);
@@ -39,13 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
     btnLunchPeriods.classList.remove('active');
     timeSlotsSection.style.display = 'block';
     lunchPeriodsSection.style.display = 'none';
-  
+
     // If there are no slots yet, auto-add one
     if (timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
       addTimeSlot();
     }
   });
-  
+
+  btnLunchPeriods.addEventListener('click', () => {
+    scheduleType = "lunchPeriods";
+    btnLunchPeriods.classList.add('active');
+    btnTimeSlots.classList.remove('active');
+    lunchPeriodsSection.style.display = 'block';
+    timeSlotsSection.style.display = 'none';
+  });
+
   function addTimeSlot() {
     const slotDiv = document.createElement('div');
     slotDiv.classList.add('time-slot');
@@ -60,28 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
     timeSlotsContainer.appendChild(slotDiv);
   }
-  
-  addSlotBtn.addEventListener('click', addTimeSlot);  
 
-  // === Time Slots Add/Remove ===
-  const addSlotBtn = document.getElementById('addSlotBtn');
-  const removeSlotBtn = document.getElementById('removeSlotBtn');
-  const timeSlotsContainer = document.getElementById('timeSlotsContainer');
-
-  addSlotBtn.addEventListener('click', () => {
-    const slotDiv = document.createElement('div');
-    slotDiv.classList.add('time-slot');
-    slotDiv.style.marginBottom = '1rem';
-    slotDiv.innerHTML = `
-      <label>Time</label>
-      <input type="time" class="slot-time" required />
-      <label>Max Spots</label>
-      <input type="number" class="slot-maxSpots" min="1" required />
-      <label>Service Hours</label>
-      <input type="number" class="slot-hours" min="1" required />
-    `;
-    timeSlotsContainer.appendChild(slotDiv);
-  });
+  addSlotBtn.addEventListener('click', addTimeSlot);
 
   removeSlotBtn.addEventListener('click', () => {
     const slots = timeSlotsContainer.querySelectorAll('.time-slot');
@@ -163,19 +156,19 @@ document.addEventListener('DOMContentLoaded', () => {
     pages.forEach((p, i) => {
       p.style.display = i === page ? 'block' : 'none';
     });
-  
+
     // Highlight progress step
     progressSteps.forEach((ps, i) => {
       ps.classList.toggle('active', i === page);
     });
-  
+
     // Control previous button
     prevBtn.disabled = page === 0;
-  
+
     // Always show nav buttons
     nextBtn.style.display = 'inline-block';
     submitBtn.style.display = 'inline-block';
-  
+
     // Decide which one is active
     if (page === pages.length - 1) {
       nextBtn.style.visibility = 'hidden';   // Hide visually but keep space
@@ -184,16 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
       nextBtn.style.visibility = 'visible';
       submitBtn.style.visibility = 'hidden';
     }
-  
+
     // Populate review step
     if (page === pages.length - 1) {
       showReview();
     }
-  }  
+  }
 
   function validatePage(page) {
     const inputs = pages[page].querySelectorAll('input, textarea, select');
-  
+
     // Step 1 and Step 2: check required fields normally
     if (page === 0 || page === 1) {
       for (const input of inputs) {
@@ -203,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-  
+
     // Step 3: custom check for schedule type
     if (page === 2) {
       if (!scheduleType) {
@@ -233,9 +226,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
-  
+
     return true;
-  }  
+  }
 
   function showReview() {
     const reviewDiv = document.getElementById('reviewContent');
@@ -281,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showReview();
       }
     }
-  });  
+  });
 
   showPage(currentPage);
 
