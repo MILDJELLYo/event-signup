@@ -17,7 +17,13 @@ fetch(`/api/events/${eventId}`)
     // Build slot dropdown options for cancel modal
     let slotOptions = '';
     event.timeSlots.forEach((slot, index) => {
-      slotOptions += `<option value="${index}">${formatTime(slot.time)} (${slot.hours} Service Hours)</option>`;
+      function isTimeFormat(timeStr) {
+        return /^\d{1,2}:\d{2}$/.test(timeStr);
+      }
+      
+      slotOptions += `<option value="${index}">${
+        isTimeFormat(slot.time) ? formatTime(slot.time) : slot.time
+      } (${slot.hours} Service Hours)</option>`;
     });
 
     // Top event info + cancel button
@@ -39,7 +45,9 @@ fetch(`/api/events/${eventId}`)
       const spotsLeft = slot.maxSpots - slot.signups.length;
       html += `
         <div style="border: 1px solid #ddd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-          <p><strong>${formatTime(slot.time)}</strong></p>
+          <p><strong>${
+            isTimeFormat(slot.time) ? formatTime(slot.time) : slot.time
+          }</strong></p>        
           <p style="color: gray;">${slot.hours} Service Hours</p>
           <p>Spots left: ${spotsLeft}</p>
           ${
