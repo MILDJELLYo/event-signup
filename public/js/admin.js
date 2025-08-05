@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // === Schedule Type Toggle ===
   let scheduleType = "";
+  console.log("Initial scheduleType:", scheduleType);
+
   const btnTimeSlots = document.getElementById('btnTimeSlots');
   const btnLunchPeriods = document.getElementById('btnLunchPeriods');
   const timeSlotsSection = document.getElementById('timeSlotsSection');
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnTimeSlots.addEventListener('click', () => {
     scheduleType = "timeSlots";
+    console.log("scheduleType set to:", scheduleType);
     btnTimeSlots.classList.add('active');
     btnLunchPeriods.classList.remove('active');
     timeSlotsSection.style.display = 'block';
@@ -41,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnLunchPeriods.addEventListener('click', () => {
     scheduleType = "lunchPeriods";
+    console.log("scheduleType set to:", scheduleType);
     btnLunchPeriods.classList.add('active');
     btnTimeSlots.classList.remove('active');
     lunchPeriodsSection.style.display = 'block';
@@ -176,6 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }  
 
   function validatePage(page) {
+    console.log("Validating page", page, "with scheduleType:", scheduleType);
+
     const inputs = pages[page].querySelectorAll('input, textarea, select');
     for (const input of inputs) {
       if (!input.checkValidity()) {
@@ -183,9 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     }
-    if (page === 2) {
+
+    if (page === 2) { // Step 3 schedule selection
       if (!scheduleType) {
-        alert('Please select a schedule type.');
+        alert('Please select a schedule type before proceeding.');
         return false;
       }
       if (scheduleType === "timeSlots" && timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
@@ -194,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (scheduleType === "lunchPeriods") {
         if (!lunch5aMax.value || !lunch5aHours.value || !lunch5bMax.value || !lunch5bHours.value) {
-          alert('Please fill in both lunch periods.');
+          alert('Please fill in all lunch period fields.');
           return false;
         }
       }
@@ -371,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const thisDate = new Date(year, month, day);
       if (thisDate.toDateString() === selectedDate.toDateString()) {
         cell.classList.add('selected');
-        hiddenDateInput.value = selectedDate.toISOString().split('T')[0]; // Set hidden input value
+        hiddenDateInput.value = selectedDate.toISOString().split('T')[0];
       }
 
       cell.addEventListener('click', () => {
