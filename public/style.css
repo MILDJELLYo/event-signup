@@ -262,61 +262,55 @@ textarea {
   background: #ef4444;
 }
 
-.quick-links {
+.quick-links-container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
-  margin: 20px 0;
-  padding: 0 10px;
+  flex-wrap: wrap;
+  margin: 30px auto;
+  max-width: 900px;
 }
 
-.link-card {
-  flex: 1 1 250px;
-  max-width: 300px;
-  min-width: 250px;
-  text-align: center;
-  padding: 20px;
-  background-color: #f0f0f0;
+.quick-card {
+  flex: 1 1 150px;
+  max-width: 180px;
+  min-width: 120px;
+  background: #f9f9f9;
   border-radius: 16px;
+  padding: 20px;
+  text-align: center;
   text-decoration: none;
-  color: black;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s;
 }
 
-.link-card:hover {
+.quick-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-.link-card .icon {
-  font-size: 36px;
+.quick-card i {
+  font-size: 28px;
   margin-bottom: 10px;
-  color: #333;
+  color: #004080;
 }
 
+.quick-card span {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* MOBILE ONLY: Grid layout */
 @media (max-width: 600px) {
-  .quick-links {
-    flex-direction: column;
-    align-items: center;
+  .quick-links-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 0 16px;
   }
 
-  .link-card {
-    width: 100%;
-    max-width: 90%;
-  }
-}
-
-/* 📱 Mobile: stack the cards */
-@media (max-width: 700px) {
-  .quick-links {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .link-card {
-    width: 100%;
+  .quick-card {
     max-width: 100%;
   }
 }
