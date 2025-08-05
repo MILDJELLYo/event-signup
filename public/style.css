@@ -307,3 +307,16 @@ textarea {
     max-width: 90%;
   }
 }
+
+/* 📱 Mobile: stack the cards */
+@media (max-width: 700px) {
+  .quick-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .link-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
