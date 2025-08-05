@@ -38,25 +38,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const timeSlotsSection = document.getElementById('timeSlotsSection');
   const lunchPeriodsSection = document.getElementById('lunchPeriodsSection');
 
+  // New toggle function that disables inputs in hidden sections
+  function toggleScheduleType(type) {
+    scheduleType = type;
+
+    if (type === "timeSlots") {
+      timeSlotsSection.style.display = 'block';
+      lunchPeriodsSection.style.display = 'none';
+
+      // Enable inputs in timeSlotsSection
+      timeSlotsSection.querySelectorAll('input').forEach(input => input.disabled = false);
+      // Disable inputs in lunchPeriodsSection
+      lunchPeriodsSection.querySelectorAll('input').forEach(input => input.disabled = true);
+
+      // Auto-add one slot if none exist
+      if (timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
+        addTimeSlot();
+      }
+    } else if (type === "lunchPeriods") {
+      lunchPeriodsSection.style.display = 'block';
+      timeSlotsSection.style.display = 'none';
+
+      // Enable inputs in lunchPeriodsSection
+      lunchPeriodsSection.querySelectorAll('input').forEach(input => input.disabled = false);
+      // Disable inputs in timeSlotsSection
+      timeSlotsSection.querySelectorAll('input').forEach(input => input.disabled = true);
+    }
+  }
+
   btnTimeSlots.addEventListener('click', () => {
-    scheduleType = "timeSlots";
+    toggleScheduleType("timeSlots");
     btnTimeSlots.classList.add('active');
     btnLunchPeriods.classList.remove('active');
-    timeSlotsSection.style.display = 'block';
-    lunchPeriodsSection.style.display = 'none';
-
-    // If there are no slots yet, auto-add one
-    if (timeSlotsContainer.querySelectorAll('.time-slot').length === 0) {
-      addTimeSlot();
-    }
   });
 
   btnLunchPeriods.addEventListener('click', () => {
-    scheduleType = "lunchPeriods";
+    toggleScheduleType("lunchPeriods");
     btnLunchPeriods.classList.add('active');
     btnTimeSlots.classList.remove('active');
-    lunchPeriodsSection.style.display = 'block';
-    timeSlotsSection.style.display = 'none';
   });
 
   function addTimeSlot() {
@@ -152,33 +171,27 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPage = 0;
 
   function showPage(page) {
-    // Show the correct form page
     pages.forEach((p, i) => {
       p.style.display = i === page ? 'block' : 'none';
     });
 
-    // Highlight progress step
     progressSteps.forEach((ps, i) => {
       ps.classList.toggle('active', i === page);
     });
 
-    // Control previous button
     prevBtn.disabled = page === 0;
 
-    // Always show nav buttons
     nextBtn.style.display = 'inline-block';
     submitBtn.style.display = 'inline-block';
 
-    // Decide which one is active
     if (page === pages.length - 1) {
-      nextBtn.style.visibility = 'hidden';   // Hide visually but keep space
+      nextBtn.style.visibility = 'hidden';
       submitBtn.style.visibility = 'visible';
     } else {
       nextBtn.style.visibility = 'visible';
       submitBtn.style.visibility = 'hidden';
     }
 
-    // Populate review step
     if (page === pages.length - 1) {
       showReview();
     }
@@ -187,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function validatePage(page) {
     const inputs = pages[page].querySelectorAll('input, textarea, select');
 
-    // Step 1 and Step 2: check required fields normally
     if (page === 0 || page === 1) {
       for (const input of inputs) {
         if (!input.checkValidity()) {
@@ -197,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Step 3: custom check for schedule type
     if (page === 2) {
       if (!scheduleType) {
         alert('Please select a schedule type.');
@@ -286,14 +297,14 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log("Validation failed on submit");
       return;
     }
-  
+
     const title = document.getElementById('title').value.trim();
     const date = document.getElementById('date').value.trim();
     const location = document.getElementById('location').value.trim();
     const description = document.getElementById('description').value.trim();
     const contactName = document.getElementById('contactName').value.trim();
     const contactEmail = document.getElementById('contactEmail').value.trim();
-  
+
     const payload = {
       title,
       date,
@@ -303,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
       contactEmail,
       scheduleType
     };
-  
+
     if (scheduleType === "timeSlots") {
       payload.timeSlots = Array.from(document.querySelectorAll('.time-slot')).map(slotEl => ({
         time: slotEl.querySelector('.slot-time').value.trim(),
@@ -314,9 +325,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (scheduleType === "lunchPeriods") {
       payload.timeSlots = getLunchPeriodsData();
     }
-  
+
     console.log("Payload to send:", payload);
-  
+
     fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -343,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Error creating event: ' + err.message);
         console.error("Create event error:", err);
       });
-  });  
+  });
 
   // === Calendar UI ===
   const calendarElement = document.getElementById('calendar');
