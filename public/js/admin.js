@@ -270,7 +270,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   nextBtn.addEventListener('click', () => {
-    if (!validatePage(currentPage)) return;
+    console.log("Next button clicked, current page:", currentPage);
+    const valid = validatePage(currentPage);
+    console.log("Validation result:", valid);
+    if (!valid) return;
     if (currentPage < pages.length - 1) {
       currentPage++;
       showPage(currentPage);
@@ -278,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showReview();
       }
     }
-  });
+  });  
 
   showPage(currentPage);
 
