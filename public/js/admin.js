@@ -192,40 +192,40 @@ document.addEventListener('DOMContentLoaded', () => {
   }  
 
   function validatePage(page) {
-    // Check required inputs on current page
     const inputs = pages[page].querySelectorAll('input, textarea, select');
-    for (const input of inputs) {
-      if (!input.checkValidity()) {
-        input.reportValidity();
-        return false;
+  
+    // Step 1 and Step 2: check required fields normally
+    if (page === 0 || page === 1) {
+      for (const input of inputs) {
+        if (!input.checkValidity()) {
+          input.reportValidity();
+          return false;
+        }
       }
     }
   
-    // Schedule page validation
-    if (page === 2) { 
+    // Step 3: custom check for schedule type
+    if (page === 2) {
       if (!scheduleType) {
         alert('Please select a schedule type.');
         return false;
       }
-  
       if (scheduleType === "timeSlots") {
         const slots = timeSlotsContainer.querySelectorAll('.time-slot');
         if (slots.length === 0) {
           alert('Please add at least one time slot.');
           return false;
         }
-        // Ensure all time slot inputs are filled
         for (const slot of slots) {
-          const time = slot.querySelector('.slot-time');
-          const max = slot.querySelector('.slot-maxSpots');
-          const hours = slot.querySelector('.slot-hours');
-          if (!time.value || !max.value || !hours.value) {
-            alert('Please fill out all fields for each time slot.');
+          const time = slot.querySelector('.slot-time').value;
+          const maxSpots = slot.querySelector('.slot-maxSpots').value;
+          const hours = slot.querySelector('.slot-hours').value;
+          if (!time || !maxSpots || !hours) {
+            alert('Please fill out all time slot fields.');
             return false;
           }
         }
       }
-  
       if (scheduleType === "lunchPeriods") {
         if (!lunch5aMax.value || !lunch5aHours.value || !lunch5bMax.value || !lunch5bHours.value) {
           alert('Please fill in both lunch periods.');
@@ -233,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     }
+  
     return true;
   }  
 
