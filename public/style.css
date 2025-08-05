@@ -261,3 +261,49 @@ textarea {
   outline: 4px solid #b91c1c;
   background: #ef4444;
 }
+
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+  padding: 0 10px;
+}
+
+.link-card {
+  flex: 1 1 250px;
+  max-width: 300px;
+  min-width: 250px;
+  text-align: center;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 16px;
+  text-decoration: none;
+  color: black;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.link-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.link-card .icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+@media (max-width: 600px) {
+  .quick-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .link-card {
+    width: 100%;
+    max-width: 90%;
+  }
+}
