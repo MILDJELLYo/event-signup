@@ -1,5 +1,5 @@
-const session = require('express-session');
 const express = require('express');
+const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
@@ -9,18 +9,17 @@ const PORT = process.env.PORT || 3000;
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 
 // --- Password for admin ---
-const ADMIN_PASSWORD = 'password'; // <--- CHANGE THIS!
+const ADMIN_PASSWORD = 'password'; // Change this!
 
 // --- Middleware ---
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // to parse form POST data
+app.use(express.urlencoded({ extended: true }));
+
 app.use(session({
-  secret: 'aVerySecretSessionKeyChangeThis', // <--- CHANGE THIS!
+  secret: 'aVerySecretSessionKeyChangeThis', // Change this!
   resave: false,
   saveUninitialized: false,
 }));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static('public'));
 
 // --- Auth middleware ---
 function checkAuth(req, res, next) {
@@ -33,7 +32,8 @@ function checkAuth(req, res, next) {
 
 // --- Serve login page ---
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
+  // Serve login.html from public folder
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // --- Handle login form submission ---
@@ -49,7 +49,8 @@ app.post('/login', (req, res) => {
 
 // --- Protect admin route ---
 app.get('/admin', checkAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
+  // Serve admin.html from public folder
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // --- Logout ---
@@ -58,6 +59,9 @@ app.get('/logout', (req, res) => {
     res.redirect('/login');
   });
 });
+
+// --- Serve static files for CSS/JS/etc ---
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Your existing event API routes below ---
 

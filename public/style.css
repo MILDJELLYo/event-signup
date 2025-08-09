@@ -263,22 +263,7 @@ textarea {
 }
 
 /* ===== Homepage Main Layout ===== */
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f9fafb; /* keep your original bg */
-  color: #111; /* keep your original text color */
-}
 
-main {
-  flex: 1;
-  max-width: 900px;
-  width: 90%;
-  margin: 2rem auto 3rem;
-  text-align: center;
-}
 
 /* Headings */
 h1 {
@@ -381,3 +366,11 @@ main > p {
   }
 }
 
+@media (max-width: 700px) {
+  .container {
+    width: 95%;
+    margin: 1rem auto;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+}
