@@ -60,7 +60,7 @@
       box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
     }
     .progress-bar {
-      background-color: #b91c1c;
+      background-image: linear-gradient(90deg, #b91c1c, #f87171); /* red to lighter red */
       height: 100%;
       width: 0%;
       transition: width 0.4s ease;
@@ -150,7 +150,7 @@
 
   <form id="lookupForm" aria-label="Lookup your service hours and meetings">
     <label for="fullName">Enter your full name:</label>
-    <input type="text" id="fullName" name="fullName" placeholder="e.g. Henry Lanier" required />
+    <input type="text" id="fullName" name="fullName" placeholder="e.g. Mustang Max" required />
     <button type="submit">Look Up</button>
   </form>
 
@@ -224,9 +224,9 @@
     
     <!-- Contact Advisor -->
     <div class="contact-advisor">
-      <strong>StuCo Advisor:</strong> Mrs. Johnson<br />
-      Email: <a href="mailto:mrs.johnson@school.edu">mrs.johnson@school.edu</a><br />
-      Phone: (555) 123-4567
+      <strong>Questions? Email:</strong> Henry Lanier<br />
+      Email: <a href="mailto:laniehen000@mysbisd.org">laniehen000@mysbisd.org</a><br />
+      Phone: (832) 392-3253
     </div>
 
     <!-- Motivational Quote -->
@@ -247,7 +247,7 @@
     const downloadReportBtn = document.getElementById('downloadReportBtn');
 
     const REQUIRED_HOURS = 30;  // static required service hours
-    const REQUIRED_MEETINGS = 10; // static required meetings
+    const REQUIRED_MEETINGS = 9; // static required meetings
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
