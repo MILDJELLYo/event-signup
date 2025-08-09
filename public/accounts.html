@@ -5,28 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Account - MHS Student Council</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
+    /* Account container styling */
+    .account-container {
+      max-width: 900px;
       margin: 2rem auto;
-      padding: 0 1rem;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(185, 28, 28, 0.1);
     }
-    header {
-      text-align: center;
-      font-size: 1.5rem;
+    h1 {
       color: #b91c1c;
-      margin-bottom: 2rem;
-      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-align: center;
     }
-    #googleSignInButton {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 2rem;
+    /* Form styling */
+    form label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #b91c1c;
     }
+    form input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    form input:focus {
+      border-color: #b91c1c;
+      outline: none;
+      box-shadow: 0 0 6px rgba(185, 28, 28, 0.3);
+    }
+    form button {
+      background-color: #b91c1c;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+    form button:hover {
+      background-color: #991b1b;
+    }
+    /* Result styling */
     #result {
-      margin-top: 1rem;
+      margin-top: 2rem;
     }
     table {
       width: 100%;
@@ -35,42 +67,58 @@
     }
     th, td {
       border: 1px solid #ddd;
-      padding: 0.5rem 1rem;
-      text-align: left;
+      padding: 0.75rem 1rem;
+      text-align: center;
     }
     th {
       background-color: #b91c1c;
       color: white;
     }
+    .info-box {
+      background: #fee2e2;
+      border: 2px solid #b91c1c;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #b91c1c;
+    }
   </style>
 </head>
 <body>
-  <header>MHS Student Council - Account Info</header>
-
-  <div id="googleSignInButton"></div>
-
-  <div id="result"></div>
+  <header>MHS Student Council</header>
+  <div class="account-container">
+    <h1>Check Your Service Hours & Meetings</h1>
+    <form id="lookupForm">
+      <label for="fullName">Enter your full name:</label>
+      <input type="text" id="fullName" name="fullName" required placeholder="First Last" />
+      <button type="submit">Look Up</button>
+    </form>
+    <div id="result"></div>
+  </div>
 
   <script>
+    const form = document.getElementById('lookupForm');
     const resultDiv = document.getElementById('result');
 
-    function handleCredentialResponse(response) {
-      const jwt = response.credential;
-      const userObject = parseJwt(jwt);
-      const fullName = userObject.name;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName = form.fullName.value.trim();
+      if (!fullName) return;
 
-      resultDiv.textContent = 'Loading account data...';
+      resultDiv.innerHTML = '<div class="info-box">Loading...</div>';
 
-      fetch('/api/userdata', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName }),
-      })
-      .then(res => {
-        if (!res.ok) throw res;
-        return res.json();
-      })
-      .then(data => {
+      try {
+        const res = await fetch(`/api/userinfo?fullName=${encodeURIComponent(fullName)}`);
+        if (!res.ok) {
+          const error = await res.json();
+          resultDiv.innerHTML = `<div class="info-box">${error.error || 'User not found'}</div>`;
+          return;
+        }
+        const data = await res.json();
+
         resultDiv.innerHTML = `
           <table>
             <tr><th>Full Name</th><td>${data.fullName}</td></tr>
@@ -79,36 +127,10 @@
             <tr><th>Position</th><td>${data.position}</td></tr>
           </table>
         `;
-      })
-      .catch(async err => {
-        let errorMsg = 'Error fetching account data.';
-        try {
-          const errJson = await err.json();
-          errorMsg = errJson.error || errorMsg;
-        } catch {}
-        resultDiv.textContent = errorMsg;
-      });
-    }
-
-    // Decode JWT token payload
-    function parseJwt(token) {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-      return JSON.parse(jsonPayload);
-    }
-
-    window.onload = () => {
-      google.accounts.id.initialize({
-        client_id: '324724100175-7f735g4nghi2io0h6chcq54mcdik1l0j.apps.googleusercontent.com',
-        callback: handleCredentialResponse,
-      });
-      google.accounts.id.renderButton(
-        document.getElementById('googleSignInButton'),
-        { theme: 'outline', size: 'large' }
-      );
-    };
+      } catch (err) {
+        resultDiv.innerHTML = '<div class="info-box">Error fetching data.</div>';
+      }
+    });
   </script>
 </body>
 </html>
