@@ -1,147 +1,53 @@
-<!-- Keep your existing styles -->
-<div class="account-container">
-  <h1>Account Summary</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Council Account</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>MHS Student Council - Account Info</header>
+  <main class="container">
+    <h1>Check Your Service Hours & Meetings</h1>
+    <form id="lookupForm">
+      <label for="fullName">Enter your full name:</label>
+      <input type="text" id="fullName" name="fullName" required />
+      <button type="submit">Look Up</button>
+    </form>
+    <div id="result" style="margin-top: 2rem;"></div>
+  </main>
+  <script>
+    const form = document.getElementById('lookupForm');
+    const resultDiv = document.getElementById('result');
 
-  <!-- Service Hours Progress -->
-  <div class="section-title">Service Hours Progress</div>
-  <div class="progress-container">
-    <div id="progress-bar" class="progress-bar" style="width: 0;"></div>
-  </div>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName = form.fullName.value.trim();
+      if (!fullName) return;
 
-  <!-- Service Hours Table -->
-  <div>
-    <div class="section-title">Service Hours</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Completed Hours</th>
-          <th>Required Hours</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="service-hours-body"></tbody>
-    </table>
-  </div>
+      resultDiv.textContent = 'Loading...';
 
-  <!-- Service Shifts Attended -->
-  <div>
-    <div class="section-title">Service Shifts Attended</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Event</th>
-          <th>Time Slot</th>
-          <th>Hours Earned</th>
-        </tr>
-      </thead>
-      <tbody id="shifts-body"></tbody>
-    </table>
-  </div>
+      try {
+        const res = await fetch(`/api/userinfo?fullName=${encodeURIComponent(fullName)}`);
+        if (!res.ok) {
+          const error = await res.json();
+          resultDiv.textContent = error.error || 'User not found';
+          return;
+        }
+        const data = await res.json();
 
-  <!-- Meetings Attended -->
-  <div>
-    <div class="section-title">Meetings Attended</div>
-    <div class="info-box" id="meetings-info"></div>
-  </div>
-
-  <!-- Next Upcoming Event -->
-  <div>
-    <div class="section-title">Next Upcoming Event</div>
-    <div class="info-box" id="next-event" style="font-weight: normal; font-size: 1rem; color: #4b5563;"></div>
-  </div>
-
-  <!-- Student Council Position -->
-  <div>
-    <div class="section-title">Your Position</div>
-    <div class="info-box" id="position-info"></div>
-  </div>
-
-  <!-- Contact Advisor -->
-  <div class="contact-advisor" id="advisor-info"></div>
-
-  <!-- Quote -->
-  <div class="quote">"Alone we can do so little; together we can do so much." – Helen Keller</div>
-</div>
-
-<script>
-async function loadAccountData() {
-  try {
-    const res = await fetch('/api/account');
-    if (!res.ok) throw new Error('Failed to fetch account data');
-    const data = await res.json();
-
-    // Progress bar
-    document.getElementById('progress-bar').style.width = `${data.progress}%`;
-
-    // Service hours table
-    const hoursBody = document.getElementById('service-hours-body');
-    hoursBody.innerHTML = '';
-    let totalCompleted = 0, totalRequired = 0;
-    data.serviceHours.forEach(item => {
-      totalCompleted += item.completed;
-      totalRequired += item.required;
-      const status = item.completed >= item.required
-        ? '<span style="color:#16a34a;">Completed</span>'
-        : `<span style="color:#dc2626;">Needs ${item.required - item.completed} more hours</span>`;
-      hoursBody.innerHTML += `
-        <tr>
-          <td>${item.category}</td>
-          <td>${item.completed}</td>
-          <td>${item.required}</td>
-          <td>${status}</td>
-        </tr>
-      `;
+        resultDiv.innerHTML = `
+          <table>
+            <tr><th>Full Name</th><td>${data.fullName}</td></tr>
+            <tr><th>Service Hours</th><td>${data.serviceHours}</td></tr>
+            <tr><th>Meeting Credit</th><td>${data.meetingCredit}</td></tr>
+            <tr><th>Position</th><td>${data.position}</td></tr>
+          </table>
+        `;
+      } catch (err) {
+        resultDiv.textContent = 'Error fetching data.';
+      }
     });
-    // Add total row
-    const totalStatus = totalCompleted >= totalRequired
-      ? '<strong style="color:#16a34a;">Complete</strong>'
-      : '<strong style="color:#dc2626;">Incomplete</strong>';
-    hoursBody.innerHTML += `
-      <tr>
-        <td><strong>Total</strong></td>
-        <td><strong>${totalCompleted}</strong></td>
-        <td><strong>${totalRequired}</strong></td>
-        <td>${totalStatus}</td>
-      </tr>
-    `;
-
-    // Shifts table
-    const shiftsBody = document.getElementById('shifts-body');
-    shiftsBody.innerHTML = data.shifts.map(s => `
-      <tr>
-        <td>${s.date}</td>
-        <td>${s.event}</td>
-        <td>${s.slot}</td>
-        <td>${s.hours}</td>
-      </tr>
-    `).join('');
-
-    // Meetings info
-    document.getElementById('meetings-info').innerHTML =
-      `You have attended <strong>${data.meetings.attended}</strong> out of <strong>${data.meetings.required}</strong> required meetings.`;
-
-    // Next event
-    document.getElementById('next-event').textContent =
-      `${data.nextEvent.name} - ${data.nextEvent.date}, ${data.nextEvent.slot}`;
-
-    // Position
-    document.getElementById('position-info').textContent = data.position;
-
-    // Advisor
-    document.getElementById('advisor-info').innerHTML = `
-      <strong>StuCo Advisor:</strong> ${data.advisor.name}<br>
-      Email: <a href="mailto:${data.advisor.email}">${data.advisor.email}</a><br>
-      Phone: ${data.advisor.phone}
-    `;
-
-  } catch (err) {
-    console.error(err);
-    alert('Error fetching account data');
-  }
-}
-
-// Run on page load
-loadAccountData();
-</script>
+  </script>
+</body>
+</html>
