@@ -198,25 +198,27 @@
     <!-- Service Shifts Attended -->
     <div>
       <div class="section-title">Service Shifts Attended</div>
-      <table>
-        <thread>
-          <tr>
-            <th>Event</th>
-            <th>Hours Earned</th>
-          </tr>
-        </thread>
-        <tbody>
-          ${data.events.map(event => `
+      if (data.events.length > 0) {
+        html += `
+        <table>
+          <thead>
             <tr>
-              <td>${event.eventName}</td>
-              <td>${event.hoursEarned}</td>
+              <th>Event Name</th>
+              <th>Hours Earned</th>
             </tr>
-          `).join('')}
-        </tbody>
-      </table>`;
-    } else {
-      html += '<p>No event participation recorded.</p>';
-    }
+          </thead>
+          <tbody>
+            ${data.events.map(event => `
+              <tr>
+                <td>${event.eventName}</td>
+                <td>${event.hoursEarned}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
+      } else {
+        html += '<p>No event participation recorded.</p>';
+      }      
 
     <!-- Download Report Button -->
     <div style="text-align: center;">
