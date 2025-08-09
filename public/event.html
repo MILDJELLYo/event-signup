@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,24 +7,27 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>MHS Student Council</header>
+  <header><a href="/" style="color: inherit; text-decoration: none;">MHS Student Council</a></header>
+
   <div class="container" id="eventContainer">
-    <p>Loading event...</p>
+    <p style="color:#6b7280;">Loading event...</p>
   </div>
+
   <!-- Cancel Signup Modal -->
-<div class="modal" id="cancelModal">
-  <div class="modal-content">
-    <span class="close-btn" id="closeCancelModal">&times;</span>
-    <h2>Cancel My Signup</h2>
-    <form id="cancelForm">
-      <label for="cancelSlot">Select Time Slot</label>
-      <select id="cancelSlot" required></select>
-      <label for="cancelName">Your Name</label>
-      <input type="text" id="cancelName" required>
-      <button type="submit" style="background:#dc2626;">Cancel Signup</button>
-    </form>
+  <div class="modal" id="cancelModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeCancelModal">&times;</span>
+      <h2>Cancel My Signup</h2>
+      <form id="cancelForm">
+        <label for="cancelSlot">Select Time Slot</label>
+        <select id="cancelSlot" required></select>
+        <label for="cancelName">Your Name</label>
+        <input type="text" id="cancelName" required />
+        <button type="submit" class="danger">Cancel Signup</button>
+      </form>
+    </div>
   </div>
-</div>
+
   <script src="js/event.js"></script>
 </body>
 </html>
