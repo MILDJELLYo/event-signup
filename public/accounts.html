@@ -270,6 +270,7 @@
           return;
         }
         const data = await res.json();
+        console.log('User data:', data);
 
         // --- Insert events table filling code here ---
         const eventsTableBody = document.getElementById('eventsTableBody');
