@@ -9,6 +9,7 @@ const EVENTS_FILE = path.join(__dirname, 'events.json');
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 function readEvents() {
   if (!fs.existsSync(EVENTS_FILE)) fs.writeFileSync(EVENTS_FILE, JSON.stringify([]));
@@ -99,3 +100,43 @@ app.post('/api/events/:id/cancel', (req, res) => {
   writeEvents(events);
   res.json({ success: true });
 });
+
+app.get('/api/getHours', async (req, res) => {
+  const email = req.query.email;
+  
+  try {
+    const rows = await getGoogleSheetRows(); // You'll write this function using Sheets API
+    const match = rows.find(r => r[3] && r[3].toLowerCase() === email.toLowerCase()); // D column (index 3)
+
+    if (match) {
+      res.json({ hours: match[0] }); // A column (index 0)
+    } else {
+      res.json({ hours: null });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error reading Google Sheet" });
+  }
+});
+
+const { google } = require('googleapis');
+const path = require('path');
+
+async function getGoogleSheetRows() {
+  const auth = new google.auth.GoogleAuth({
+    keyFile: path.join(__dirname, 'service-account.json'),
+    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+  });
+
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  const spreadsheetId = 'YOUR_SHEET_ID'; // from the URL of your Google Sheet
+  const range = 'Sheet1!A:D'; // Adjust to match your sheet & columns
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range,
+  });
+
+  return res.data.values || [];
+}

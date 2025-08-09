@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Service Hours - MHS Student Council</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+<header>MHS Student Council</header>
+
+<div class="container">
+  <h1>Your Service Hours</h1>
+
+  <div id="loginSection">
+    <div id="g_id_onload"
+         data-client_id="324724100175-7f735g4nghi2io0h6chcq54mcdik1l0j.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline"
+         data-text="sign_in_with"
+         data-shape="rectangular"
+         data-logo_alignment="left">
+    </div>
+  </div>
+
+  <div id="hoursSection" style="display:none;">
+    <p id="welcomeMessage"></p>
+    <p><strong>Service Hours:</strong> <span id="hoursCount"></span></p>
+  </div>
+</div>
+
+<script src="js/hours.js"></script>
+</body>
+</html>
