@@ -11,6 +11,7 @@ npm-debug.log*
 
 # Service account key or any JSON with secrets
 *.json
+service-account.json
 
 # Ignore OS files
 .DS_Store
