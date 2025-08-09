@@ -77,20 +77,6 @@ app.get('/api/userinfo', async (req, res) => {
   }
 });
 
-// Redirect from .html URLs to extensionless URLs
-app.get('/*.html', (req, res) => {
-  const urlWithoutExt = req.path.replace(/\.html$/, '');
-  res.redirect(301, urlWithoutExt);
-});
-
-// Serve extensionless URLs by sending .html files
-app.get('/:page', (req, res, next) => {
-  const page = req.params.page;
-  res.sendFile(path.join(__dirname, 'public', `${page}.html`), err => {
-    if (err) next();
-  });
-});
-
 // --- Your existing event API routes ---
 
 function readEvents() {
