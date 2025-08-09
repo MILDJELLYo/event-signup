@@ -62,10 +62,10 @@ app.get('/logout', (req, res) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- New API route to get user data from Google Sheets ---
-app.post('/api/userdata', async (req, res) => {
+app.get('/api/userinfo', async (req, res) => {
   try {
-    const { fullName } = req.body;
-    if (!fullName) return res.status(400).json({ error: 'Full name is required' });
+    const fullName = req.query.fullName;
+    if (!fullName) return res.status(400).json({ error: 'Missing fullName query parameter' });
 
     const data = await getUserData(fullName);
     if (!data) return res.status(404).json({ error: 'User not found' });
