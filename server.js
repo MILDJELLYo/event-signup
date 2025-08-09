@@ -65,6 +65,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Your existing event API routes below ---
 
+// Add routes for other pages (replace with your actual page names)
+app.get('/eventlist', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'eventlist.html'));
+});
+
+app.get('/requirements', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'requirements.html'));
+});
+
+app.get('/event', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'event.html'));
+});
+
 function readEvents() {
   if (!fs.existsSync(EVENTS_FILE)) fs.writeFileSync(EVENTS_FILE, JSON.stringify([]));
   return JSON.parse(fs.readFileSync(EVENTS_FILE));
