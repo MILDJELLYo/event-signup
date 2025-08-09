@@ -1,36 +1,53 @@
-const { google } = require('googleapis');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Council Account</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>MHS Student Council - Account Info</header>
+  <main class="container">
+    <h1>Check Your Service Hours & Meetings</h1>
+    <form id="lookupForm">
+      <label for="fullName">Enter your full name:</label>
+      <input type="text" id="fullName" name="fullName" required />
+      <button type="submit">Look Up</button>
+    </form>
+    <div id="result" style="margin-top: 2rem;"></div>
+  </main>
+  <script>
+    const form = document.getElementById('lookupForm');
+    const resultDiv = document.getElementById('result');
 
-const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON),
-  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-});
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName = form.fullName.value.trim();
+      if (!fullName) return;
 
-const SPREADSHEET_ID = '1xy-Esq5L7LAcImbIgAqFUDYnsNfhuV_NSbM8nULNfE8';
+      resultDiv.textContent = 'Loading...';
 
-async function getUserData(fullName) {
-  if (!fullName) throw new Error('Missing fullName parameter');
+      try {
+        const res = await fetch(`/api/userinfo?fullName=${encodeURIComponent(fullName)}`);
+        if (!res.ok) {
+          const error = await res.json();
+          resultDiv.textContent = error.error || 'User not found';
+          return;
+        }
+        const data = await res.json();
 
-  const client = await auth.getClient();
-  const googleSheets = google.sheets({ version: 'v4', auth: client });
-
-  const response = await googleSheets.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
-    range: 'Sheet1!A2:D',
-  });
-
-  const rows = response.data.values || [];
-  const userRow = rows.find(row => row[0].toLowerCase() === fullName.toLowerCase());
-
-  if (!userRow) {
-    return null;
-  }
-
-  return {
-    fullName: userRow[0],
-    serviceHours: userRow[1] || '0',
-    meetingCredit: userRow[2] || '0',
-    position: userRow[3] || 'Member',
-  };
-}
-
-module.exports = { getUserData };
+        resultDiv.innerHTML = `
+          <table>
+            <tr><th>Full Name</th><td>${data.fullName}</td></tr>
+            <tr><th>Service Hours</th><td>${data.serviceHours}</td></tr>
+            <tr><th>Meeting Credit</th><td>${data.meetingCredit}</td></tr>
+            <tr><th>Position</th><td>${data.position}</td></tr>
+          </table>
+        `;
+      } catch (err) {
+        resultDiv.textContent = 'Error fetching data.';
+      }
+    });
+  </script>
+</body>
+</html>
