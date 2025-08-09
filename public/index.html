@@ -1,30 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MHS Student Council Events</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MHS Student Council - Members Area</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header>MHS Student Council</header>
-<div id="quickLinks" class="quick-links">
-  <a href="eventlist.html" class="link-card">
-    <i class="fas fa-calendar icon"></i>
-    <h2>Events</h2>
-  </a>
-  <a href="https://forms.gle/ju3RsRBJV86HkvSK8" target="_blank" class="link-card">
-    <i class="fas fa-check-square icon"></i>
-    <h2>Check-in</h2>
-  </a>
-  <a href="requirements.html" class="link-card">
-    <i class="fas fa-compass icon"></i>
-    <h2>Requirements</h2>
-  </a>
-  <a href="https://docs.google.com/spreadsheets/d/1AOZ9o7UfEcvocfHg9xolU6vLalgBwmWwAmTd9hvL98A/edit?usp=sharing" target="_blank" class="link-card">
-    <i class="fas fa-stopwatch icon"></i>
-    <h2>Service Hours</h2>
-  </a>
-<script src="js/index.js"></script>
+  <header>MHS Student Council</header>
+
+  <main class="container">
+    <h1>MHS Student Council Portal</h1>
+    <p>Please use the links below to access council resources and check Remind updates.</p>
+
+    <div id="quickLinks" class="quick-links">
+      <a href="eventlist.html" class="link-card" aria-label="Events">
+        <i class="fas fa-calendar icon" aria-hidden="true"></i>
+        <h2>Events</h2>
+      </a>
+      <a href="https://forms.gle/ju3RsRBJV86HkvSK8" target="_blank" rel="noopener" class="link-card" aria-label="Check-in form">
+        <i class="fas fa-check-square icon" aria-hidden="true"></i>
+        <h2>Check-in</h2>
+      </a>
+      <a href="requirements.html" class="link-card" aria-label="Requirements">
+        <i class="fas fa-compass icon" aria-hidden="true"></i>
+        <h2>Requirements</h2>
+      </a>
+      <a href="https://docs.google.com/spreadsheets/d/1AOZ9o7UfEcvocfHg9xolU6vLalgBwmWwAmTd9hvL98A/edit?usp=sharing" target="_blank" rel="noopener" class="link-card" aria-label="Service Hours Spreadsheet">
+        <i class="fas fa-stopwatch icon" aria-hidden="true"></i>
+        <h2>Service Hours</h2>
+      </a>
+    </div>
+    
+
+<h2>Remind Updates</h2>
+<div id="remindWrapper"></div>
+<script src="https://widgets.remind.com/iframe.js?token=267cdbf0d70a013b83e40242ac110005&height=400&join=true"></script>
+
+<script>
+  // Wait a bit to let Remind script create its container
+  setTimeout(() => {
+    const remindContainer = document.querySelector('.remind-iframe-container');
+    const wrapper = document.getElementById('remindWrapper');
+    if(remindContainer && wrapper && !wrapper.contains(remindContainer)) {
+      wrapper.appendChild(remindContainer);
+    }
+  }, 1000); // 1 second delay (adjust if needed)
+</script>
+
+
+  </main>
+
+  <script src="js/index.js"></script>
 </body>
 </html>

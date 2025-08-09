@@ -1,3 +1,4 @@
+const session = require('express-session');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -7,9 +8,58 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 
+// --- Password for admin ---
+const ADMIN_PASSWORD = 'password'; // <--- CHANGE THIS!
+
+// --- Middleware ---
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // to parse form POST data
+app.use(session({
+  secret: 'aVerySecretSessionKeyChangeThis', // <--- CHANGE THIS!
+  resave: false,
+  saveUninitialized: false,
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
+
+// --- Auth middleware ---
+function checkAuth(req, res, next) {
+  if (req.session && req.session.loggedIn) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+}
+
+// --- Serve login page ---
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// --- Handle login form submission ---
+app.post('/login', (req, res) => {
+  const { password } = req.body;
+  if (password === ADMIN_PASSWORD) {
+    req.session.loggedIn = true;
+    res.redirect('/admin');
+  } else {
+    res.send('Incorrect password. <a href="/login">Try again</a>');
+  }
+});
+
+// --- Protect admin route ---
+app.get('/admin', checkAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// --- Logout ---
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
+  });
+});
+
+// --- Your existing event API routes below ---
 
 function readEvents() {
   if (!fs.existsSync(EVENTS_FILE)) fs.writeFileSync(EVENTS_FILE, JSON.stringify([]));
@@ -45,7 +95,7 @@ app.post('/api/events', (req, res) => {
     description,
     contactName,
     contactEmail,
-    scheduleType,  // <-- add this line to save scheduleType
+    scheduleType,
     timeSlots: timeSlots.map(slot => ({
       time: slot.time,
       hours: slot.hours,
@@ -84,8 +134,7 @@ app.delete('/api/events/:id', (req, res) => {
   res.json({ success: true });
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
+// Cancel signup
 app.post('/api/events/:id/cancel', (req, res) => {
   const { slotIndex, name } = req.body;
   const events = readEvents();
@@ -100,3 +149,6 @@ app.post('/api/events/:id/cancel', (req, res) => {
   writeEvents(events);
   res.json({ success: true });
 });
+
+// --- Start server ---
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
