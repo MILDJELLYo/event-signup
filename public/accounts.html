@@ -1,134 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Account - MHS Student Council</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    /* (Include your styling here from the new profile you posted) */
-    /* For brevity, I’m not repeating the full CSS here */
-  </style>
-</head>
-<body>
-<header>MHS Student Council</header>
+const { google } = require('googleapis');
 
-<div class="account-container">
-  <h1>Account Summary</h1>
+const auth = new google.auth.GoogleAuth({
+  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON),
+  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+});
 
-  <form id="lookupForm" style="margin-bottom: 2rem;">
-    <label for="fullName">Enter your full name:</label>
-    <input type="text" id="fullName" name="fullName" required />
-    <button type="submit">Look Up</button>
-  </form>
+const SPREADSHEET_ID = '1xy-Esq5L7LAcImbIgAqFUDYnsNfhuV_NSbM8nULNfE8';
 
-  <div id="result" aria-live="polite"></div>
-</div>
+async function getUserData(fullName) {
+  if (!fullName) throw new Error('Missing fullName parameter');
 
-<script>
-  const form = document.getElementById('lookupForm');
-  const resultDiv = document.getElementById('result');
+  const client = await auth.getClient();
+  const googleSheets = google.sheets({ version: 'v4', auth: client });
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fullName = form.fullName.value.trim();
-    if (!fullName) return;
-
-    resultDiv.textContent = 'Loading...';
-
-    try {
-      const res = await fetch('/api/userdata', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fullName }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        resultDiv.textContent = error.error || 'User not found';
-        return;
-      }
-
-      const data = await res.json();
-
-      // Example: parse service hours to number to calculate progress (assume goal 45)
-      const serviceHoursNum = Number(data.serviceHours) || 0;
-      const serviceGoal = 45;
-      const progressPercent = Math.min((serviceHoursNum / serviceGoal) * 100, 100);
-
-      // Build the inner HTML with your style and data
-      resultDiv.innerHTML = `
-        <div class="section-title">Service Hours Progress</div>
-        <div class="progress-container" aria-label="Service Hours Progress Bar">
-          <div class="progress-bar" style="width: ${progressPercent}%;"></div>
-        </div>
-
-        <div>
-          <div class="section-title">Service Hours</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Completed Hours</th>
-                <th>Required Hours</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Community Service</td>
-                <td>${serviceHoursNum}</td>
-                <td>${serviceGoal}</td>
-                <td style="color: ${serviceHoursNum < serviceGoal ? '#dc2626' : '#16a34a'};">
-                  ${serviceHoursNum < serviceGoal ? `Needs ${serviceGoal - serviceHoursNum} more hours` : 'Completed'}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Total</strong></td>
-                <td><strong>${serviceHoursNum}</strong></td>
-                <td><strong>${serviceGoal}</strong></td>
-                <td style="color: ${serviceHoursNum < serviceGoal ? '#dc2626' : '#16a34a'};">
-                  <strong>${serviceHoursNum < serviceGoal ? 'Incomplete' : 'Complete'}</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div>
-          <div class="section-title">Meetings Attended</div>
-          <div class="info-box">
-            You have attended <strong>${data.meetingCredit}</strong> meetings.
-          </div>
-        </div>
-
-        <div>
-          <div class="section-title">Your Position</div>
-          <div class="info-box">
-            ${data.position}
-          </div>
-        </div>
-
-        <div style="text-align: center;">
-          <a href="#" class="btn-download" onclick="alert('Download report feature coming soon!')">Download My Report</a>
-        </div>
-
-        <div class="contact-advisor">
-          <strong>StuCo Advisor:</strong> Mrs. Johnson<br />
-          Email: <a href="mailto:mrs.johnson@school.edu">mrs.johnson@school.edu</a><br />
-          Phone: (555) 123-4567
-        </div>
-
-        <div class="quote">
-          "Alone we can do so little; together we can do so much." – Helen Keller
-        </div>
-      `;
-    } catch (err) {
-      console.error(err);
-      resultDiv.textContent = 'Error fetching data.';
-    }
+  const response = await googleSheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'Sheet1!A2:D',
   });
-</script>
 
-</body>
-</html>
+  const rows = response.data.values || [];
+  const userRow = rows.find(row => row[0].toLowerCase() === fullName.toLowerCase());
+
+  if (!userRow) {
+    return null;
+  }
+
+  return {
+    fullName: userRow[0],
+    serviceHours: userRow[1] || '0',
+    meetingCredit: userRow[2] || '0',
+    position: userRow[3] || 'Member',
+  };
+}
+
+module.exports = { getUserData };
