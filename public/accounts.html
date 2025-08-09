@@ -6,7 +6,7 @@
   <title>Account - MHS Student Council</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Account container styling */
+    /* Include your previous style from the fancy profile page for container, headers, tables, etc. */
     .account-container {
       max-width: 900px;
       margin: 2rem auto;
@@ -19,6 +19,52 @@
       color: #b91c1c;
       margin-bottom: 1.5rem;
       text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+    th {
+      background-color: #b91c1c;
+      color: white;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #b91c1c;
+    }
+    .info-box {
+      background: #fee2e2;
+      border: 2px solid #b91c1c;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #b91c1c;
+    }
+    /* Progress bar */
+    .progress-container {
+      background: #f3f4f6;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      height: 24px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .progress-bar {
+      background-color: #b91c1c;
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
     }
     /* Form styling */
     form label {
@@ -56,35 +102,6 @@
     form button:hover {
       background-color: #991b1b;
     }
-    /* Result styling */
-    #result {
-      margin-top: 2rem;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 0.75rem 1rem;
-      text-align: center;
-    }
-    th {
-      background-color: #b91c1c;
-      color: white;
-    }
-    .info-box {
-      background: #fee2e2;
-      border: 2px solid #b91c1c;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-top: 1rem;
-      font-weight: 600;
-      text-align: center;
-      font-size: 1.1rem;
-      color: #b91c1c;
-    }
   </style>
 </head>
 <body>
@@ -119,13 +136,142 @@
         }
         const data = await res.json();
 
+        // Assuming your data object looks like this:
+        // data = {
+        //   fullName: "John Doe",
+        //   serviceHours: 40,
+        //   requiredHours: 45,
+        //   communityServiceHours: 25,
+        //   communityServiceRequired: 30,
+        //   eventParticipationHours: 15,
+        //   eventParticipationRequired: 15,
+        //   meetingsAttended: 8,
+        //   meetingsRequired: 10,
+        //   nextEvent: "Beach Cleanup - August 10, 2025, 9am - 11am",
+        //   position: "Vice President",
+        //   serviceShifts: [
+        //     {date: "Aug 10, 2025", event: "Beach Cleanup", time: "9am - 11am", hours: 2},
+        //     {date: "Aug 18, 2025", event: "Food Drive", time: "1pm - 4pm", hours: 3},
+        //     {date: "Sept 1, 2025", event: "School Fundraiser", time: "3pm - 6pm", hours: 3},
+        //   ]
+        // };
+
+        // Calculate total progress %
+        let progressPercent = Math.min((data.serviceHours / data.requiredHours) * 100, 100);
+
+        // Helper function for status text and color
+        function getStatusText(completed, required) {
+          if (completed >= required) return `<span style="color:#16a34a;">Completed</span>`;
+          else return `<span style="color:#dc2626;">Needs ${required - completed} more hours</span>`;
+        }
+
+        // Build the service shifts rows HTML
+        const serviceShiftsRows = data.serviceShifts.map(shift => `
+          <tr>
+            <td>${shift.date}</td>
+            <td>${shift.event}</td>
+            <td>${shift.time}</td>
+            <td>${shift.hours}</td>
+          </tr>
+        `).join('');
+
+        // Final HTML
         resultDiv.innerHTML = `
-          <table>
-            <tr><th>Full Name</th><td>${data.fullName}</td></tr>
-            <tr><th>Service Hours</th><td>${data.serviceHours}</td></tr>
-            <tr><th>Meeting Credit</th><td>${data.meetingCredit}</td></tr>
-            <tr><th>Position</th><td>${data.position}</td></tr>
-          </table>
+          <h1>Account Summary for ${data.fullName}</h1>
+
+          <div class="section-title">Service Hours Progress</div>
+          <div class="progress-container" aria-label="Service Hours Progress Bar">
+            <div class="progress-bar" style="width: ${progressPercent}%;"></div>
+          </div>
+
+          <div>
+            <div class="section-title">Service Hours</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Completed Hours</th>
+                  <th>Required Hours</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Community Service</td>
+                  <td>${data.communityServiceHours}</td>
+                  <td>${data.communityServiceRequired}</td>
+                  <td>${getStatusText(data.communityServiceHours, data.communityServiceRequired)}</td>
+                </tr>
+                <tr>
+                  <td>Event Participation</td>
+                  <td>${data.eventParticipationHours}</td>
+                  <td>${data.eventParticipationRequired}</td>
+                  <td>${getStatusText(data.eventParticipationHours, data.eventParticipationRequired)}</td>
+                </tr>
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td><strong>${data.serviceHours}</strong></td>
+                  <td><strong>${data.requiredHours}</strong></td>
+                  <td>${data.serviceHours >= data.requiredHours ? 
+                    `<span style="color:#16a34a;"><strong>Completed</strong></span>` : 
+                    `<span style="color:#dc2626;"><strong>Incomplete</strong></span>`}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <div class="section-title">Service Shifts Attended</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Event</th>
+                  <th>Time Slot</th>
+                  <th>Hours Earned</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${serviceShiftsRows}
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <div class="section-title">Meetings Attended</div>
+            <div class="info-box">
+              You have attended <strong>${data.meetingsAttended}</strong> out of <strong>${data.meetingsRequired}</strong> required meetings.
+            </div>
+          </div>
+
+          <div>
+            <div class="section-title">Next Upcoming Event</div>
+            <div class="info-box" style="font-weight: normal; font-size: 1rem; color: #4b5563;">
+              ${data.nextEvent}
+            </div>
+          </div>
+
+          <div style="text-align: center;">
+            <a href="#" class="btn-download" onclick="alert('Download report feature coming soon!')">Download My Report</a>
+          </div>
+
+          <div>
+            <div class="section-title">Your Position</div>
+            <div class="info-box">
+              ${data.position}
+            </div>
+          </div>
+
+          <div class="contact-advisor">
+            <strong>StuCo Advisor:</strong> Mrs. Johnson<br />
+            Email: <a href="mailto:mrs.johnson@school.edu">mrs.johnson@school.edu</a><br />
+            Phone: (555) 123-4567
+          </div>
+
+          <div class="quote">
+            "Alone we can do so little; together we can do so much." – Helen Keller
+          </div>
         `;
       } catch (err) {
         resultDiv.innerHTML = '<div class="info-box">Error fetching data.</div>';
