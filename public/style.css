@@ -374,29 +374,3 @@ main > p {
     box-sizing: border-box;
   }
 }
-
-/* ===== Homepage Table Styles ===== */
-
-table {
-  margin: 1rem auto;
-  border-collapse: collapse;
-  width: 90%;
-  max-width: 500px;
-  font-size: 1.1rem;
-}
-
-th, td {
-  padding: 0.8rem 1.2rem;
-  border: 1px solid #b91c1c;
-  text-align: left;
-}
-
-th {
-  background-color: #b91c1c;
-  color: white;
-  font-weight: 600;
-}
-
-td {
-  background-color: #fff0f0;
-}
