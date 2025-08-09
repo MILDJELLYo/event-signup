@@ -6,7 +6,7 @@
   <title>Account - MHS Student Council</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* Include your previous style from the fancy profile page for container, headers, tables, etc. */
+    /* keep all your styles from before... */
     .account-container {
       max-width: 900px;
       margin: 2rem auto;
@@ -14,6 +14,7 @@
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(185, 28, 28, 0.1);
+      display: none;
     }
     h1 {
       color: #b91c1c;
@@ -49,9 +50,7 @@
       font-weight: 600;
       text-align: center;
       font-size: 1.1rem;
-      color: #b91c1c;
     }
-    /* Progress bar */
     .progress-container {
       background: #f3f4f6;
       border-radius: 12px;
@@ -66,215 +65,228 @@
       width: 0%;
       transition: width 0.4s ease;
     }
-    /* Form styling */
-    form label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #b91c1c;
-    }
-    form input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      margin-bottom: 1rem;
-      transition: border-color 0.3s ease;
-    }
-    form input:focus {
-      border-color: #b91c1c;
-      outline: none;
-      box-shadow: 0 0 6px rgba(185, 28, 28, 0.3);
-    }
-    form button {
+    .btn-download {
+      display: inline-block;
       background-color: #b91c1c;
       color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      font-size: 1.1rem;
+      padding: 0.7rem 1.5rem;
       border-radius: 8px;
-      cursor: pointer;
       font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      margin-bottom: 2rem;
       transition: background-color 0.3s ease;
-      width: 100%;
     }
-    form button:hover {
+    .btn-download:hover {
+      background-color: #991b1b;
+    }
+    .contact-advisor {
+      background: #fef2f2;
+      border: 2px solid #b91c1c;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+      color: #b91c1c;
+    }
+    .quote {
+      font-style: italic;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 2rem;
+      font-size: 1rem;
+    }
+    #errorMessage {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+      border: 2px solid #dc2626;
+      background: #fee2e2;
+      color: #b91c1c;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 8px;
+      display: none;
+    }
+    form {
+      max-width: 900px;
+      margin: 2rem auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+    label {
+      font-weight: 600;
+      color: #b91c1c;
+    }
+    input[type="text"] {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1px solid #b91c1c;
+      font-size: 1rem;
+      min-width: 250px;
+      flex-grow: 1;
+    }
+    button[type="submit"] {
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+      background-color: #b91c1c;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button[type="submit"]:hover {
       background-color: #991b1b;
     }
   </style>
 </head>
 <body>
   <header>MHS Student Council</header>
-  <div class="account-container">
-    <h1>Check Your Service Hours & Meetings</h1>
-    <form id="lookupForm">
-      <label for="fullName">Enter your full name:</label>
-      <input type="text" id="fullName" name="fullName" required placeholder="First Last" />
-      <button type="submit">Look Up</button>
-    </form>
-    <div id="result"></div>
+
+  <form id="lookupForm" aria-label="Lookup your service hours and meetings">
+    <label for="fullName">Enter your full name:</label>
+    <input type="text" id="fullName" name="fullName" placeholder="e.g. Henry Lanier" required />
+    <button type="submit">Look Up</button>
+  </form>
+
+  <div id="errorMessage" role="alert"></div>
+
+  <div class="account-container" id="accountContainer" aria-live="polite" aria-atomic="true">
+    <h1>Account Summary</h1>
+    
+    <!-- Service Hours Progress Bar -->
+    <div class="section-title">Service Hours Progress</div>
+    <div class="progress-container" aria-label="Service Hours Progress Bar">
+      <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+    </div>
+    
+    <!-- Service Hours Table -->
+    <div>
+      <div class="section-title">Service Hours</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Completed Hours</th>
+            <th>Required Hours</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="serviceHoursBody">
+          <tr>
+            <td>Community Service</td>
+            <td id="completedHours">0</td>
+            <td>30</td>
+            <td id="serviceStatus" style="color:#dc2626;">Needs hours</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Meetings Attended -->
+    <div>
+      <div class="section-title">Meetings Attended</div>
+      <div class="info-box" id="meetingsAttended">
+        You have attended <strong>0</strong> out of <strong>10</strong> required meetings.
+      </div>
+    </div>
+
+    <!-- Download Report Button -->
+    <div style="text-align: center;">
+      <a href="#" class="btn-download" id="downloadReportBtn">Download My Report</a>
+    </div>
+    
+    <!-- Student Council Position -->
+    <div>
+      <div class="section-title">Your Position</div>
+      <div class="info-box" id="positionBox">No Position</div>
+    </div>
+    
+    <!-- Contact Advisor -->
+    <div class="contact-advisor">
+      <strong>StuCo Advisor:</strong> Mrs. Johnson<br />
+      Email: <a href="mailto:mrs.johnson@school.edu">mrs.johnson@school.edu</a><br />
+      Phone: (555) 123-4567
+    </div>
+
+    <!-- Motivational Quote -->
+    <div class="quote">
+      "Alone we can do so little; together we can do so much." – Helen Keller
+    </div>
   </div>
 
   <script>
     const form = document.getElementById('lookupForm');
-    const resultDiv = document.getElementById('result');
+    const errorMessage = document.getElementById('errorMessage');
+    const accountContainer = document.getElementById('accountContainer');
+    const progressBar = document.getElementById('progressBar');
+    const completedHoursCell = document.getElementById('completedHours');
+    const serviceStatusCell = document.getElementById('serviceStatus');
+    const meetingsAttendedBox = document.getElementById('meetingsAttended');
+    const positionBox = document.getElementById('positionBox');
+    const downloadReportBtn = document.getElementById('downloadReportBtn');
+
+    const REQUIRED_HOURS = 30;  // static required service hours
+    const REQUIRED_MEETINGS = 10; // static required meetings
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const fullName = form.fullName.value.trim();
-      if (!fullName) return;
+      errorMessage.style.display = 'none';
+      accountContainer.style.display = 'none';
 
-      resultDiv.innerHTML = '<div class="info-box">Loading...</div>';
+      const fullName = form.fullName.value.trim();
+      if (!fullName) {
+        errorMessage.textContent = "Please enter your full name.";
+        errorMessage.style.display = 'block';
+        return;
+      }
 
       try {
         const res = await fetch(`/api/userinfo?fullName=${encodeURIComponent(fullName)}`);
         if (!res.ok) {
-          const error = await res.json();
-          resultDiv.innerHTML = `<div class="info-box">${error.error || 'User not found'}</div>`;
+          const err = await res.json();
+          errorMessage.textContent = err.error || "User not found.";
+          errorMessage.style.display = 'block';
           return;
         }
         const data = await res.json();
 
-        // Assuming your data object looks like this:
-        // data = {
-        //   fullName: "John Doe",
-        //   serviceHours: 40,
-        //   requiredHours: 45,
-        //   communityServiceHours: 25,
-        //   communityServiceRequired: 30,
-        //   eventParticipationHours: 15,
-        //   eventParticipationRequired: 15,
-        //   meetingsAttended: 8,
-        //   meetingsRequired: 10,
-        //   nextEvent: "Beach Cleanup - August 10, 2025, 9am - 11am",
-        //   position: "Vice President",
-        //   serviceShifts: [
-        //     {date: "Aug 10, 2025", event: "Beach Cleanup", time: "9am - 11am", hours: 2},
-        //     {date: "Aug 18, 2025", event: "Food Drive", time: "1pm - 4pm", hours: 3},
-        //     {date: "Sept 1, 2025", event: "School Fundraiser", time: "3pm - 6pm", hours: 3},
-        //   ]
-        // };
+        // Update completed service hours & progress bar
+        const completedHours = data.serviceHours ?? 0;
+        completedHoursCell.textContent = completedHours;
 
-        // Calculate total progress %
-        let progressPercent = Math.min((data.serviceHours / data.requiredHours) * 100, 100);
+        const progressPercent = Math.min(100, Math.round((completedHours / REQUIRED_HOURS) * 100));
+        progressBar.style.width = progressPercent + '%';
 
-        // Helper function for status text and color
-        function getStatusText(completed, required) {
-          if (completed >= required) return `<span style="color:#16a34a;">Completed</span>`;
-          else return `<span style="color:#dc2626;">Needs ${required - completed} more hours</span>`;
+        if (completedHours >= REQUIRED_HOURS) {
+          serviceStatusCell.textContent = 'Completed';
+          serviceStatusCell.style.color = '#16a34a'; // green
+        } else {
+          serviceStatusCell.textContent = `Needs ${REQUIRED_HOURS - completedHours} more hours`;
+          serviceStatusCell.style.color = '#dc2626'; // red
         }
 
-        // Build the service shifts rows HTML
-        const serviceShiftsRows = data.serviceShifts.map(shift => `
-          <tr>
-            <td>${shift.date}</td>
-            <td>${shift.event}</td>
-            <td>${shift.time}</td>
-            <td>${shift.hours}</td>
-          </tr>
-        `).join('');
+        // Update meetings attended text
+        const meetingsAttended = data.meetingCredit ?? 0;
+        meetingsAttendedBox.innerHTML = `You have attended <strong>${meetingsAttended}</strong> out of <strong>${REQUIRED_MEETINGS}</strong> required meetings.`;
 
-        // Final HTML
-        resultDiv.innerHTML = `
-          <h1>Account Summary for ${data.fullName}</h1>
+        // Update position
+        positionBox.textContent = data.position || 'No Position';
 
-          <div class="section-title">Service Hours Progress</div>
-          <div class="progress-container" aria-label="Service Hours Progress Bar">
-            <div class="progress-bar" style="width: ${progressPercent}%;"></div>
-          </div>
+        // Show container
+        accountContainer.style.display = 'block';
 
-          <div>
-            <div class="section-title">Service Hours</div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Category</th>
-                  <th>Completed Hours</th>
-                  <th>Required Hours</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Community Service</td>
-                  <td>${data.communityServiceHours}</td>
-                  <td>${data.communityServiceRequired}</td>
-                  <td>${getStatusText(data.communityServiceHours, data.communityServiceRequired)}</td>
-                </tr>
-                <tr>
-                  <td>Event Participation</td>
-                  <td>${data.eventParticipationHours}</td>
-                  <td>${data.eventParticipationRequired}</td>
-                  <td>${getStatusText(data.eventParticipationHours, data.eventParticipationRequired)}</td>
-                </tr>
-                <tr>
-                  <td><strong>Total</strong></td>
-                  <td><strong>${data.serviceHours}</strong></td>
-                  <td><strong>${data.requiredHours}</strong></td>
-                  <td>${data.serviceHours >= data.requiredHours ? 
-                    `<span style="color:#16a34a;"><strong>Completed</strong></span>` : 
-                    `<span style="color:#dc2626;"><strong>Incomplete</strong></span>`}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        // Download report button action (optional)
+        downloadReportBtn.onclick = () => alert('Download report feature coming soon!');
 
-          <div>
-            <div class="section-title">Service Shifts Attended</div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Event</th>
-                  <th>Time Slot</th>
-                  <th>Hours Earned</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${serviceShiftsRows}
-              </tbody>
-            </table>
-          </div>
-
-          <div>
-            <div class="section-title">Meetings Attended</div>
-            <div class="info-box">
-              You have attended <strong>${data.meetingsAttended}</strong> out of <strong>${data.meetingsRequired}</strong> required meetings.
-            </div>
-          </div>
-
-          <div>
-            <div class="section-title">Next Upcoming Event</div>
-            <div class="info-box" style="font-weight: normal; font-size: 1rem; color: #4b5563;">
-              ${data.nextEvent}
-            </div>
-          </div>
-
-          <div style="text-align: center;">
-            <a href="#" class="btn-download" onclick="alert('Download report feature coming soon!')">Download My Report</a>
-          </div>
-
-          <div>
-            <div class="section-title">Your Position</div>
-            <div class="info-box">
-              ${data.position}
-            </div>
-          </div>
-
-          <div class="contact-advisor">
-            <strong>StuCo Advisor:</strong> Mrs. Johnson<br />
-            Email: <a href="mailto:mrs.johnson@school.edu">mrs.johnson@school.edu</a><br />
-            Phone: (555) 123-4567
-          </div>
-
-          <div class="quote">
-            "Alone we can do so little; together we can do so much." – Helen Keller
-          </div>
-        `;
-      } catch (err) {
-        resultDiv.innerHTML = '<div class="info-box">Error fetching data.</div>';
+      } catch (error) {
+        errorMessage.textContent = "Error fetching data. Please try again later.";
+        errorMessage.style.display = 'block';
       }
     });
   </script>
