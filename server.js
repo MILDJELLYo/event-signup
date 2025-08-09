@@ -3,6 +3,7 @@ const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { getUserData } = require('./sheets'); // your Google Sheets helper
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,7 +15,6 @@ const ADMIN_PASSWORD = 'password'; // Change this!
 // --- Middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
 app.use(session({
   secret: 'aVerySecretSessionKeyChangeThis', // Change this!
   resave: false,
@@ -32,7 +32,6 @@ function checkAuth(req, res, next) {
 
 // --- Serve login page ---
 app.get('/login', (req, res) => {
-  // Serve login.html from public folder
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
@@ -49,7 +48,6 @@ app.post('/login', (req, res) => {
 
 // --- Protect admin route ---
 app.get('/admin', checkAuth, (req, res) => {
-  // Serve admin.html from public folder
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
@@ -60,23 +58,26 @@ app.get('/logout', (req, res) => {
   });
 });
 
-// --- Serve static files for CSS/JS/etc ---
+// --- Static files ---
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- Your existing event API routes below ---
+// --- New API route to get user data from Google Sheets ---
+app.post('/api/userdata', async (req, res) => {
+  try {
+    const { fullName } = req.body;
+    if (!fullName) return res.status(400).json({ error: 'Full name is required' });
 
-// Add routes for other pages (replace with your actual page names)
-app.get('/eventlist', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'eventlist.html'));
+    const data = await getUserData(fullName);
+    if (!data) return res.status(404).json({ error: 'User not found' });
+
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-app.get('/requirements', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'requirements.html'));
-});
-
-app.get('/event', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'event.html'));
-});
+// --- Your existing event API routes ---
 
 function readEvents() {
   if (!fs.existsSync(EVENTS_FILE)) fs.writeFileSync(EVENTS_FILE, JSON.stringify([]));
@@ -87,12 +88,10 @@ function writeEvents(events) {
   fs.writeFileSync(EVENTS_FILE, JSON.stringify(events, null, 2));
 }
 
-// Get all events
 app.get('/api/events', (req, res) => {
   res.json(readEvents());
 });
 
-// Get single event
 app.get('/api/events/:id', (req, res) => {
   const events = readEvents();
   const event = events.find(e => e.id === req.params.id);
@@ -100,7 +99,6 @@ app.get('/api/events/:id', (req, res) => {
   res.json(event);
 });
 
-// Create event with time slots
 app.post('/api/events', (req, res) => {
   const { title, date, location, description, contactName, contactEmail, scheduleType, timeSlots } = req.body;
   const events = readEvents();
@@ -125,7 +123,6 @@ app.post('/api/events', (req, res) => {
   res.status(201).json(newEvent);
 });
 
-// Sign up for a specific slot
 app.post('/api/events/:id/signup', (req, res) => {
   const { slotIndex, name } = req.body;
   const events = readEvents();
@@ -143,7 +140,6 @@ app.post('/api/events/:id/signup', (req, res) => {
   res.json(event);
 });
 
-// Delete event
 app.delete('/api/events/:id', (req, res) => {
   let events = readEvents();
   events = events.filter(e => e.id !== req.params.id);
@@ -151,7 +147,6 @@ app.delete('/api/events/:id', (req, res) => {
   res.json({ success: true });
 });
 
-// Cancel signup
 app.post('/api/events/:id/cancel', (req, res) => {
   const { slotIndex, name } = req.body;
   const events = readEvents();
