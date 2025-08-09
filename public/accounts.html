@@ -4,50 +4,272 @@
   <meta charset="UTF-8" />
   <title>Student Council Account</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .account-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(185, 28, 28, 0.1);
+    }
+    header {
+      background: #b91c1c;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    h1 {
+      color: #b91c1c;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem 1rem;
+      text-align: center;
+    }
+    th {
+      background-color: #b91c1c;
+      color: white;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #b91c1c;
+    }
+    .info-box {
+      background: #fee2e2;
+      border: 2px solid #b91c1c;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+    /* Progress bar */
+    .progress-container {
+      background: #f3f4f6;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      height: 24px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .progress-bar {
+      background-color: #b91c1c;
+      height: 100%;
+      width: 65%; /* this will be overridden by inline style */
+      transition: width 0.4s ease;
+    }
+    .contact-advisor {
+      background: #fef2f2;
+      border: 2px solid #b91c1c;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+      color: #b91c1c;
+    }
+    .quote {
+      font-style: italic;
+      text-align: center;
+      color: #6b7280;
+      margin-top: 2rem;
+      font-size: 1rem;
+    }
+    @media (max-width: 600px) {
+  .account-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  /* Make form inputs and buttons full width stacked vertically */
+  form#lookupForm {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  form#lookupForm label {
+    margin-bottom: 0.5rem;
+  }
+  
+  form#lookupForm input,
+  form#lookupForm button {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Tables scroll horizontally instead of squishing */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  th, td {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  /* Smaller progress bar height */
+  .progress-container {
+    height: 18px;
+  }
+  
+  .progress-bar {
+    height: 18px;
+  }
+  
+  /* Reduce padding inside info boxes */
+  .info-box, .contact-advisor {
+    padding: 0.75rem;
+    font-size: 1rem;
+  }
+  
+  /* Smaller quote font size */
+  .quote {
+    font-size: 0.9rem;
+  }
+}
+  </style>
+  
 </head>
 <body>
-  <header>MHS Student Council - Account Info</header>
-  <main class="container">
-    <h1>Check Your Service Hours & Meetings</h1>
-    <form id="lookupForm">
+  <header>MHS Student Council</header>
+  
+  <div class="account-container">
+    <h1>Account Summary</h1>
+  
+    <form id="lookupForm" style="margin-bottom: 2rem; text-align: center;">
       <label for="fullName">Enter your full name:</label>
-      <input type="text" id="fullName" name="fullName" required />
-      <button type="submit">Look Up</button>
+      <input type="text" id="fullName" name="fullName" required style="margin-left: 0.5rem; padding: 0.4rem;" />
+      <button type="submit" style="margin-left: 0.5rem; padding: 0.5rem 1rem; background:#b91c1c; color:#fff; border:none; border-radius:6px; cursor:pointer;">
+        Look Up
+      </button>
     </form>
+  
     <div id="result" style="margin-top: 2rem;"></div>
-  </main>
+  </div>
+  
   <script>
     const form = document.getElementById('lookupForm');
     const resultDiv = document.getElementById('result');
-
+  
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fullName = form.fullName.value.trim();
       if (!fullName) return;
-
-      resultDiv.textContent = 'Loading...';
-
+  
+      resultDiv.innerHTML = '<p>Loading...</p>';
+  
       try {
-        const res = await fetch(`/api/userinfo?fullName=${encodeURIComponent(fullName)}`);
+        // Change this to POST if your server expects POST (your code does expect POST)
+        const res = await fetch('/api/userdata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullName }),
+        });
+  
         if (!res.ok) {
           const error = await res.json();
-          resultDiv.textContent = error.error || 'User not found';
+          resultDiv.innerHTML = `<p style="color:#dc2626;">${error.error || 'User not found'}</p>`;
           return;
         }
         const data = await res.json();
-
+  
+        // Assume required hours for example (can also come from API if you want)
+        const requiredServiceHours = 45;
+        const completed = parseFloat(data.serviceHours) || 0;
+        const progressPercent = Math.min(100, (completed / requiredServiceHours) * 100);
+  
         resultDiv.innerHTML = `
-          <table>
-            <tr><th>Full Name</th><td>${data.fullName}</td></tr>
-            <tr><th>Service Hours</th><td>${data.serviceHours}</td></tr>
-            <tr><th>Meeting Credit</th><td>${data.meetingCredit}</td></tr>
-            <tr><th>Position</th><td>${data.position}</td></tr>
-          </table>
+          <!-- Service Hours Progress Bar -->
+          <div class="section-title">Service Hours Progress</div>
+          <div class="progress-container" aria-label="Service Hours Progress Bar">
+            <div class="progress-bar" style="width: ${progressPercent}%;"></div>
+          </div>
+  
+          <!-- Service Hours Table -->
+          <div>
+            <div class="section-title">Service Hours</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Completed Hours</th>
+                  <th>Required Hours</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Community Service</td>
+                  <td>${completed}</td>
+                  <td>${requiredServiceHours}</td>
+                  <td style="color: ${completed >= requiredServiceHours ? '#16a34a' : '#dc2626'};">
+                    ${completed >= requiredServiceHours ? 'Completed' : `Needs ${requiredServiceHours - completed} more hours`}
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Total</strong></td>
+                  <td><strong>${completed}</strong></td>
+                  <td><strong>${requiredServiceHours}</strong></td>
+                  <td style="color: ${completed >= requiredServiceHours ? '#16a34a' : '#dc2626'};">
+                    <strong>${completed >= requiredServiceHours ? 'Complete' : 'Incomplete'}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+          <!-- Meetings Attended -->
+          <div>
+            <div class="section-title">Meetings Attended</div>
+            <div class="info-box">
+              You have attended <strong>${data.meetingCredit || 0}</strong> required meetings.
+            </div>
+          </div>
+  
+          <!-- Your Position -->
+          <div>
+            <div class="section-title">Your Position</div>
+            <div class="info-box">${data.position || 'Member'}</div>
+          </div>
+  
+          <!-- Contact Advisor -->
+          <div class="contact-advisor">
+            <strong>StuCo Advisor:</strong> Mrs. Johnson<br />
+            Email: <a href="mailto:mrs.johnson@school.edu">mrs.johnson@school.edu</a><br />
+            Phone: (555) 123-4567
+          </div>
+  
+          <!-- Motivational Quote -->
+          <div class="quote">
+            "Alone we can do so little; together we can do so much." – Helen Keller
+          </div>
         `;
       } catch (err) {
-        resultDiv.textContent = 'Error fetching data.';
+        console.error(err);
+        resultDiv.innerHTML = '<p style="color:#dc2626;">Error fetching data.</p>';
       }
     });
   </script>
-</body>
+  </body>  
 </html>
