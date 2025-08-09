@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+
+# Service account key or any JSON with secrets
+*.json
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore local development files
+*.local
