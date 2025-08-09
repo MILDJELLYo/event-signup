@@ -198,27 +198,18 @@
     <!-- Service Shifts Attended -->
     <div>
       <div class="section-title">Service Shifts Attended</div>
-      if (data.events.length > 0) {
-        html += `
-        <table>
-          <thead>
-            <tr>
-              <th>Event Name</th>
-              <th>Hours Earned</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.events.map(event => `
-              <tr>
-                <td>${event.eventName}</td>
-                <td>${event.hoursEarned}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>`;
-      } else {
-        html += '<p>No event participation recorded.</p>';
-      }      
+      <table>
+        <thead>
+          <tr>
+            <th>Event Name</th>
+            <th>Hours Earned</th>
+          </tr>
+        </thead>
+        <tbody id="eventsTableBody">
+          <!-- JS will fill this -->
+        </tbody>
+      </table>
+    </div>   
 
     <!-- Download Report Button -->
     <div style="text-align: center;">
@@ -280,6 +271,32 @@
         }
         const data = await res.json();
 
+        // --- Insert events table filling code here ---
+        const eventsTableBody = document.getElementById('eventsTableBody');
+        eventsTableBody.innerHTML = '';
+
+        if (Array.isArray(data.events) && data.events.length > 0) {
+         data.events.forEach(event => {
+           const row = document.createElement('tr');
+            const eventNameCell = document.createElement('td');
+           eventNameCell.textContent = event.eventName || 'Unknown Event';
+
+           const hoursCell = document.createElement('td');
+           hoursCell.textContent = event.hoursEarned || '0';
+
+           row.appendChild(eventNameCell);
+           row.appendChild(hoursCell);
+            eventsTableBody.appendChild(row);
+          });
+        } else {
+         const row = document.createElement('tr');
+          const noDataCell = document.createElement('td');
+          noDataCell.colSpan = 2;
+          noDataCell.style.textAlign = 'center';
+          noDataCell.textContent = 'No service shifts recorded.';
+          row.appendChild(noDataCell);
+          eventsTableBody.appendChild(row);
+        }
         // Update completed service hours & progress bar
         const completedHours = data.serviceHours ?? 0;
         completedHoursCell.textContent = completedHours;
