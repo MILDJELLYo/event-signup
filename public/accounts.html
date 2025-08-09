@@ -2,40 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Student Council Account</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account - MHS Student Council</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    header {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #b91c1c;
+      margin-bottom: 2rem;
+      font-weight: bold;
+    }
+    #googleSignInButton {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    #result {
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem 1rem;
+      text-align: left;
+    }
+    th {
+      background-color: #b91c1c;
+      color: white;
+    }
+  </style>
 </head>
 <body>
   <header>MHS Student Council - Account Info</header>
-  <main class="container">
-    <h1>Check Your Service Hours & Meetings</h1>
-    <form id="lookupForm">
-      <label for="fullName">Enter your full name:</label>
-      <input type="text" id="fullName" name="fullName" required />
-      <button type="submit">Look Up</button>
-    </form>
-    <div id="result" style="margin-top: 2rem;"></div>
-  </main>
+
+  <div id="googleSignInButton"></div>
+
+  <div id="result"></div>
+
   <script>
-    const form = document.getElementById('lookupForm');
     const resultDiv = document.getElementById('result');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const fullName = form.fullName.value.trim();
-      if (!fullName) return;
+    function handleCredentialResponse(response) {
+      const jwt = response.credential;
+      const userObject = parseJwt(jwt);
+      const fullName = userObject.name;
 
-      resultDiv.textContent = 'Loading...';
+      resultDiv.textContent = 'Loading account data...';
 
-      try {
-        const res = await fetch(`/api/userinfo?fullName=${encodeURIComponent(fullName)}`);
-        if (!res.ok) {
-          const error = await res.json();
-          resultDiv.textContent = error.error || 'User not found';
-          return;
-        }
-        const data = await res.json();
-
+      fetch('/api/userdata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName }),
+      })
+      .then(res => {
+        if (!res.ok) throw res;
+        return res.json();
+      })
+      .then(data => {
         resultDiv.innerHTML = `
           <table>
             <tr><th>Full Name</th><td>${data.fullName}</td></tr>
@@ -44,10 +79,36 @@
             <tr><th>Position</th><td>${data.position}</td></tr>
           </table>
         `;
-      } catch (err) {
-        resultDiv.textContent = 'Error fetching data.';
-      }
-    });
+      })
+      .catch(async err => {
+        let errorMsg = 'Error fetching account data.';
+        try {
+          const errJson = await err.json();
+          errorMsg = errJson.error || errorMsg;
+        } catch {}
+        resultDiv.textContent = errorMsg;
+      });
+    }
+
+    // Decode JWT token payload
+    function parseJwt(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      return JSON.parse(jsonPayload);
+    }
+
+    window.onload = () => {
+      google.accounts.id.initialize({
+        client_id: '324724100175-7f735g4nghi2io0h6chcq54mcdik1l0j.apps.googleusercontent.com',
+        callback: handleCredentialResponse,
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('googleSignInButton'),
+        { theme: 'outline', size: 'large' }
+      );
+    };
   </script>
 </body>
 </html>
