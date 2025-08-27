@@ -9,12 +9,23 @@ fetch('/api/events')
     events.forEach(e => {
       const div = document.createElement('div');
       div.className = 'event-card';
-      const dateStr = new Date(e.date).toLocaleDateString('en-US');
+
+      // Extract month/day
+      const dateObj = new Date(e.date);
+      const month = dateObj.toLocaleString('en-US', { month: 'short' });
+      const day = dateObj.getDate();
+
       div.innerHTML = `
-        <h2>${e.title}</h2>
-        <p>${dateStr} • ${e.location}</p>
-        <p>${e.timeSlots.length} time slot(s)</p>
-        <a href="event.html?id=${e.id}"><button>View & Sign Up</button></a>
+        <div class="event-date">
+          <span class="month">${month}</span>
+          <span class="day">${day}</span>
+        </div>
+        <div class="event-details">
+          <h3>${e.title}</h3>
+          <p class="event-location"><i class="fas fa-map-marker-alt"></i> ${e.location}</p>
+          <p class="event-time"><i class="fas fa-clock"></i> ${e.timeSlots.length} time slot(s)</p>
+          <a href="event.html?id=${e.id}" class="btn">View & Sign Up</a>
+        </div>
       `;
       list.appendChild(div);
     });

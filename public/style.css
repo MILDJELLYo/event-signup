@@ -96,28 +96,76 @@ textarea {
 
 /* ===== Event Cards ===== */
 .event-card {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1.2rem;
+  align-items: center;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
   background-color: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-  transition: transform 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .event-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
 
-.event-card h2 {
-  color: #b91c1c;
-  margin-bottom: 0.5rem;
+/* Date block */
+.event-date {
+  background: #b91c1c;
+  color: #fff;
+  text-align: center;
+  border-radius: 10px;
+  padding: 0.6rem 0.4rem;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.event-card p {
+.event-date .month {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.event-date .day {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* Details */
+.event-details h3 {
+  margin: 0 0 0.5rem;
+  color: #111;
+}
+
+.event-details p {
+  margin: 0.25rem 0;
   color: #6b7280;
-  margin-bottom: 1rem;
+  font-size: 0.95rem;
 }
+
+.event-details .btn {
+  display: inline-block;
+  margin-top: 0.8rem;
+  background-color: #b91c1c;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.event-details .btn:hover {
+  background-color: #991b1b;
+}
+
 
 /* ===== Progress Bar ===== */
 .progress-bar {
