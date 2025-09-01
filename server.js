@@ -140,6 +140,27 @@ app.post('/api/events/:id/signup', (req, res) => {
   res.json(event);
 });
 
+app.post('/api/events/:id/waitlist', (req, res) => {
+  const { slotIndex, name } = req.body;
+  const events = readEvents();
+  const event = events.find(e => e.id === req.params.id);
+  if (!event) return res.status(404).json({ error: 'Event not found' });
+
+  const slot = event.timeSlots[slotIndex];
+  if (!slot) return res.status(400).json({ error: 'Invalid slot index' });
+
+  if (!slot.waitlist) slot.waitlist = [];
+
+  // Prevent duplicates
+  if (slot.waitlist.some(s => s.toLowerCase() === name.toLowerCase())) {
+    return res.status(400).json({ error: 'Already on waitlist' });
+  }
+
+  slot.waitlist.push(name);
+  writeEvents(events);
+  res.json({ success: true });
+});
+
 app.delete('/api/events/:id', (req, res) => {
   let events = readEvents();
   events = events.filter(e => e.id !== req.params.id);
@@ -157,7 +178,15 @@ app.post('/api/events/:id/cancel', (req, res) => {
   const index = slot.signups.findIndex(s => s.toLowerCase() === name.toLowerCase());
   if (index === -1) return res.status(404).json({ error: 'Signup not found' });
 
+  // Remove signup
   slot.signups.splice(index, 1);
+
+  // Promote from waitlist if available
+  if (slot.waitlist && slot.waitlist.length > 0) {
+    const promoted = slot.waitlist.shift();
+    slot.signups.push(promoted);
+  }
+
   writeEvents(events);
   res.json({ success: true });
 });
