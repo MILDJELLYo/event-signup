@@ -11,12 +11,29 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header><a href="/" style="color: inherit; text-decoration: none;">MHS Student Council</a></header>
+  <!-- Ttiel -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="/" class="logo">MHS Student Council</a>
+  </nav>
 
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <a href="index.html">Member Home</a>
+    <a href="#">Announcements</a>
+    <a href="eventlist.html">Events</a>
+    <a href="#">Committees</a>
+    <a href="#">Documents</a>
+    <a href="#">Directory</a>
+    <a href="accounts.html">Service Hours</a>
+  </aside>
+
+  <!-- Main Content -->
   <main class="container">
     <h1>MHS Student Council Portal</h1>
-    <p>Please use the links below to access council resources and check Remind updates.</p>
+    <p>Use the dashboard below to quickly access council resources and updates.</p>
 
+    <!-- Quick Links -->
     <div id="quickLinks" class="quick-links">
       <a href="eventlist.html" class="link-card" aria-label="Events">
         <i class="fas fa-calendar icon" aria-hidden="true"></i>
@@ -36,23 +53,23 @@
       </a>
     </div>
     
+    <div class="spacer"></div>
 
-<h2>Remind Updates</h2>
-<div id="remindWrapper"></div>
-<script src="https://widgets.remind.com/iframe.js?token=267cdbf0d70a013b83e40242ac110005&height=400&join=true"></script>
+    <!-- Remind Widget -->
+    <h2>Announcements</h2>
+    <div id="remindWrapper"></div>
+    <script src="https://widgets.remind.com/iframe.js?token=267cdbf0d70a013b83e40242ac110005&height=400&join=true"></script>
 
-<script>
-  // Wait a bit to let Remind script create its container
-  setTimeout(() => {
-    const remindContainer = document.querySelector('.remind-iframe-container');
-    const wrapper = document.getElementById('remindWrapper');
-    if(remindContainer && wrapper && !wrapper.contains(remindContainer)) {
-      wrapper.appendChild(remindContainer);
-    }
-  }, 1000); // 1 second delay (adjust if needed)
-</script>
-
-
+    <script>
+      // Wait a bit to let Remind script create its container
+      setTimeout(() => {
+        const remindContainer = document.querySelector('.remind-iframe-container');
+        const wrapper = document.getElementById('remindWrapper');
+        if(remindContainer && wrapper && !wrapper.contains(remindContainer)) {
+          wrapper.appendChild(remindContainer);
+        }
+      }, 1000);
+    </script>
   </main>
 
   <script src="js/index.js"></script>

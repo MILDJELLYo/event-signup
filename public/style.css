@@ -13,15 +13,63 @@ html, body {
   min-height: 100%;
 }
 
-/* ===== Header ===== */
-header {
-  background-color: #b91c1c; /* Memorial Red */
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: bold;
-  padding: 1rem 2rem;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+/* ===== Top Navigation ===== */
+.top-nav {
+  background: #b91c1c;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.top-nav a {
+  color: white;
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-weight: 500;
+}
+
+.top-nav a:hover {
+  text-decoration: underline;
+}
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  background: #f3f4f6;
+  width: 220px;
+  min-height: 100vh;
+  padding: 1rem;
+  border-right: 1px solid #e5e7eb;
+  position: fixed;
+  top: 3.6rem; /* below navbar */
+  left: 0;
+}
+
+.sidebar a {
+  display: block;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem;
+  border-radius: 6px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sidebar a:hover {
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 /* ===== Container ===== */
@@ -329,40 +377,31 @@ main > p {
 /* Quick Links Grid Override for Homepage */
 .quick-links {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
-  margin-bottom: 3rem;
-  padding: 0 10px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
-/* Override link cards for homepage with Memorial Red accent */
 .link-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.15); /* red tinted shadow */
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-align: center;
+  padding: 2rem 1rem;
+  transition: 0.2s ease;
   color: #b91c1c;
-  font-weight: 600;
-  padding: 1.5rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border: 2px solid transparent;
   text-decoration: none;
 }
 
-.link-card:hover,
-.link-card:focus {
-  box-shadow: 0 8px 24px rgba(185, 28, 28, 0.3);
-  transform: translateY(-4px);
-  border-color: #b91c1c;
-  outline: none;
+.link-card:hover {
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transform: translateY(-3px);
 }
 
 .link-card .icon {
   font-size: 2.6rem;
   margin-bottom: 0.7rem;
-  color: #b91c1c;
 }
 
 /* Style the Remind widget container */
@@ -390,35 +429,16 @@ main > p {
 
 
 
-/* Responsive tweaks */
-@media (max-width: 700px) {
-  main {
-    width: 95%;
-    margin: 1rem auto 2rem;
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
   }
-
-  #remindEmbed {
-    height: 300px;
-  }
-
-  /* Quick links grid for smaller devices */
-  .quick-links {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-}
-
-@media (max-width: 400px) {
-  .quick-links {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 700px) {
   .container {
-    width: 95%;
-    margin: 1rem auto;
-    padding: 1rem;
-    box-sizing: border-box;
+    margin-left: 0;
   }
+}
+
+.spacer {
+  height: 2rem;
 }
