@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MHS Student Council - Directory</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="/" class="logo">MHS Student Council</a>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <a href="index.html">Member Home</a>
+    <a href="#">Announcements</a>
+    <a href="eventlist.html">Events</a>
+    <a href="#">Committees</a>
+    <a href="directory.html">Directory</a>
+    <a href="#">Documents</a>
+    <a href="accounts.html">Service Hours</a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="container">
+    <h1>Student Council Directory</h1>
+    <p>Search for members by name, position, or grade.</p>
+
+    <!-- Search Bar -->
+    <input
+      type="text"
+      id="directorySearch"
+      placeholder="Search by name, position, or grade..."
+      style="width: 100%; padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1.5rem; font-size: 1rem;"
+    />
+
+    <div id="directoryList" class="directory-list">
+      <!-- Directory entries will be loaded here via JS -->
+    </div>
+  </main>
+
+  <script src="js/directory.js"></script>
+</body>
+</html>

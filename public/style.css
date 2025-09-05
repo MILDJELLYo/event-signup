@@ -442,3 +442,42 @@ main > p {
 .spacer {
   height: 2rem;
 }
+
+/* ===== Directory ===== */
+.directory-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.directory-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.directory-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.directory-card h3 {
+  margin-bottom: 0.3rem;
+  color: #b91c1c;
+}
+
+.directory-card p {
+  margin: 0.2rem 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.directory-card .role {
+  font-weight: 600;
+  color: #111;
+}
