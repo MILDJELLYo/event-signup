@@ -53,7 +53,7 @@ function requireLogin(req, res, next) {
 app.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
     // Already logged in → skip login
-    return res.redirect('/dashboard');
+    return res.redirect('/index.html');
   }
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
@@ -75,7 +75,7 @@ app.post('/login', async (req, res) => {
     req.session.position = user.position;
     req.session.grade = user.grade;
 
-    res.redirect('/dashboard');
+    res.redirect('/index.html');
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");
