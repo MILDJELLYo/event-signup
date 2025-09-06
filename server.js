@@ -3,90 +3,31 @@ const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const fetch = require('node-fetch'); // 👈 for pulling the CSV
+const { getUserData } = require('./sheets'); // your Google Sheets helper
+const bcrypt = require('bcryptjs');
+const mysql = require('mysql2/promise');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 
-// --- Google Sheet CSV (your Directory) ---
-const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9nsgWRuANHKqhFPeAWN88MvusJSzkQtcm4nUdaVIjAky1WifmSchquUEg0BV5r1dEvedKnKjtyiwC/pub?gid=411848997&single=true&output=csv";
-
-// --- Middleware ---
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: 'aVerySecretSessionKeyChangeThis', // 👈 CHANGE THIS
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false } // true if HTTPS
-}));
-
-// --- Helper: load accounts from CSV ---
-async function loadAccounts() {
-  const res = await fetch(sheetCSV);
-  const csv = await res.text();
-
-  const rows = csv.split("\n").filter(r => r.trim() !== "");
-  const headers = rows[0].split(",");
-
-  return rows.slice(1).map(row => {
-    const values = row.split(",");
-    let obj = {};
-    headers.forEach((h, i) => {
-      obj[h.trim()] = values[i] ? values[i].trim() : "";
-    });
-    return obj;
-  });
-}
-
-// --- Middleware to check authentication ---
-function requireLogin(req, res, next) {
-  if (req.session && req.session.userId) {
-    next(); // ✅ Already logged in, proceed
-  } else {
-    res.redirect('/login'); // ❌ Not logged in, send to login
-  }
-}
-
-// --- Make /login accessible without auth ---
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const accounts = await loadAccounts(); // CSV loader
-    const user = accounts.find(
-      u => u.Email.toLowerCase() === email.toLowerCase() && u.Password === password
-    );
-
-    if (!user) {
-      return res.status(401).send("❌ Invalid email or password. <a href='/login.html'>Try again</a>");
-    }
-
-    // Save session info
-    req.session.userId = user.Email;
-    req.session.position = user.Position;
-    req.session.grade = user.Grade;
-
-    res.redirect('/index.html');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("❌ Server error. Check server logs.");
-  }
-});
-
-// Serve CSS, JS, images publicly
+// --- Static files ---
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Protect HTML pages
-app.get(['/index.html','/directory.html','/admin.html'], requireLogin, (req, res, next) => {
-  next(); // allow access
-});
+// --- API route to get user data from Google Sheets ---
+app.get('/api/userinfo', async (req, res) => {
+  try {
+    const fullName = req.query.fullName;
+    if (!fullName) return res.status(400).json({ error: 'Missing fullName query parameter' });
 
+    const data = await getUserData(fullName);
+    if (!data) return res.status(404).json({ error: 'User not found' });
 
-// --- Dashboard (default after login) ---
-app.get('/', requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html')); 
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 // --- Event API routes (unchanged) ---
