@@ -50,40 +50,39 @@ function requireLogin(req, res, next) {
 }
 
 // --- Make /login accessible without auth ---
-app.get('/login', (req, res) => {
-  if (req.session && req.session.userId) {
-    // Already logged in → skip login
-    return res.redirect('/index.html');
-  }
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-    if (rows.length === 0) return res.send("❌ Invalid email or password");
+    const accounts = await loadAccounts(); // CSV loader
+    const user = accounts.find(
+      u => u.Email.toLowerCase() === email.toLowerCase() && u.Password === password
+    );
 
-    const user = rows[0];
-    const match = await bcrypt.compare(password, user.password);
-
-    if (!match) return res.send("❌ Invalid email or password");
+    if (!user) {
+      return res.status(401).send("❌ Invalid email or password. <a href='/login.html'>Try again</a>");
+    }
 
     // Save session info
-    req.session.userId = user.id;
-    req.session.position = user.position;
-    req.session.grade = user.grade;
+    req.session.userId = user.Email;
+    req.session.position = user.Position;
+    req.session.grade = user.Grade;
 
     res.redirect('/index.html');
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server error");
+    res.status(500).send("❌ Server error. Check server logs.");
   }
 });
 
-// --- Protect all static files (index.html, etc) ---
-app.use(requireLogin, express.static(path.join(__dirname, 'public')));
+// Serve CSS, JS, images publicly
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Protect HTML pages
+app.get(['/index.html','/directory.html','/admin.html'], requireLogin, (req, res, next) => {
+  next(); // allow access
+});
+
 
 // --- Dashboard (default after login) ---
 app.get('/', requireLogin, (req, res) => {
