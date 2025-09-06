@@ -1,0 +1,13 @@
+# Force HTTPS (if your host supports HTTPS; most do)
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Security headers (good defaults)
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "no-referrer-when-downgrade"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Content-Security-Policy "default-src 'self' https: data: blob:; script-src 'self' https://cdnjs.cloudflare.com https://widgets.remind.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; frame-src https://widgets.remind.com;"
+</IfModule>

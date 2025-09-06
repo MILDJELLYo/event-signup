@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Login</title>
-  <style>
-    body { font-family: system-ui, sans-serif; background: #f9fafb; display: flex; height: 100vh; justify-content: center; align-items: center; }
-    form { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    input { padding: 0.5rem; font-size: 1rem; margin-bottom: 1rem; width: 100%; border: 1px solid #ccc; border-radius: 6px; }
-    button { background-color: #b91c1c; color: white; border: none; padding: 0.7rem; width: 100%; font-size: 1rem; border-radius: 6px; cursor: pointer; }
-    button:hover { background-color: #991b1b; }
-  </style>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <form method="POST" action="/login">
-    <h2>Admin Login</h2>
-    <input type="password" name="password" placeholder="Enter password" required />
-    <button type="submit">Sign In</button>
-  </form>
+  <main class="container" style="max-width:420px; margin-top:6rem;">
+    <h1>Login</h1>
+    <form method="POST" action="/login">
+      <label>Email</label>
+      <input type="email" name="email" required>
+      <label>Password</label>
+      <input type="password" name="password" required>
+      <button type="submit">Log In</button>
+    </form>
+  </main>
 </body>
 </html>

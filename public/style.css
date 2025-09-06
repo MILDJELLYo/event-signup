@@ -75,7 +75,7 @@ html, body {
 /* ===== Container ===== */
 .container {
   max-width: 900px;
-  margin: 2rem auto;
+  margin: 5rem auto;
   padding: 1.5rem;
   background: #fff;
   border-radius: 12px;

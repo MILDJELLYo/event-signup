@@ -3,82 +3,94 @@ const session = require('express-session');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { getUserData } = require('./sheets'); // your Google Sheets helper
+const fetch = require('node-fetch'); // 👈 for pulling the CSV
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const EVENTS_FILE = path.join(__dirname, 'events.json');
 
-// --- Password for admin ---
-const ADMIN_PASSWORD = 'password'; // Change this!
+// --- Google Sheet CSV (your Directory) ---
+const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9nsgWRuANHKqhFPeAWN88MvusJSzkQtcm4nUdaVIjAky1WifmSchquUEg0BV5r1dEvedKnKjtyiwC/pub?gid=411848997&single=true&output=csv";
 
 // --- Middleware ---
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-  secret: 'aVerySecretSessionKeyChangeThis', // Change this!
+  secret: 'aVerySecretSessionKeyChangeThis', // 👈 CHANGE THIS
   resave: false,
   saveUninitialized: false,
+  cookie: { secure: false } // true if HTTPS
 }));
 
-// --- Auth middleware ---
-function checkAuth(req, res, next) {
-  if (req.session && req.session.loggedIn) {
-    next();
+// --- Helper: load accounts from CSV ---
+async function loadAccounts() {
+  const res = await fetch(sheetCSV);
+  const csv = await res.text();
+
+  const rows = csv.split("\n").filter(r => r.trim() !== "");
+  const headers = rows[0].split(",");
+
+  return rows.slice(1).map(row => {
+    const values = row.split(",");
+    let obj = {};
+    headers.forEach((h, i) => {
+      obj[h.trim()] = values[i] ? values[i].trim() : "";
+    });
+    return obj;
+  });
+}
+
+// --- Middleware to check authentication ---
+function requireLogin(req, res, next) {
+  if (req.session && req.session.userId) {
+    next(); // ✅ Already logged in, proceed
   } else {
-    res.redirect('/login');
+    res.redirect('/login'); // ❌ Not logged in, send to login
   }
 }
 
-// --- Serve login page ---
+// --- Make /login accessible without auth ---
 app.get('/login', (req, res) => {
+  if (req.session && req.session.userId) {
+    // Already logged in → skip login
+    return res.redirect('/dashboard');
+  }
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
-// --- Handle login form submission ---
-app.post('/login', (req, res) => {
-  const { password } = req.body;
-  if (password === ADMIN_PASSWORD) {
-    req.session.loggedIn = true;
-    res.redirect('/admin');
-  } else {
-    res.send('Incorrect password. <a href="/login">Try again</a>');
-  }
-});
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
 
-// --- Protect admin route ---
-app.get('/admin', checkAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-// --- Logout ---
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/login');
-  });
-});
-
-// --- Static files ---
-app.use(express.static(path.join(__dirname, 'public')));
-
-// --- New API route to get user data from Google Sheets ---
-app.get('/api/userinfo', async (req, res) => {
   try {
-    const fullName = req.query.fullName;
-    if (!fullName) return res.status(400).json({ error: 'Missing fullName query parameter' });
+    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+    if (rows.length === 0) return res.send("❌ Invalid email or password");
 
-    const data = await getUserData(fullName);
-    if (!data) return res.status(404).json({ error: 'User not found' });
+    const user = rows[0];
+    const match = await bcrypt.compare(password, user.password);
 
-    res.json(data);
+    if (!match) return res.send("❌ Invalid email or password");
+
+    // Save session info
+    req.session.userId = user.id;
+    req.session.position = user.position;
+    req.session.grade = user.grade;
+
+    res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).send("Server error");
   }
 });
 
-// --- Your existing event API routes ---
+// --- Protect all static files (index.html, etc) ---
+app.use(requireLogin, express.static(path.join(__dirname, 'public')));
 
+// --- Dashboard (default after login) ---
+app.get('/', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html')); 
+});
+
+// --- Event API routes (unchanged) ---
 function readEvents() {
   if (!fs.existsSync(EVENTS_FILE)) fs.writeFileSync(EVENTS_FILE, JSON.stringify([]));
   return JSON.parse(fs.readFileSync(EVENTS_FILE));
@@ -151,7 +163,6 @@ app.post('/api/events/:id/waitlist', (req, res) => {
 
   if (!slot.waitlist) slot.waitlist = [];
 
-  // Prevent duplicates
   if (slot.waitlist.some(s => s.toLowerCase() === name.toLowerCase())) {
     return res.status(400).json({ error: 'Already on waitlist' });
   }
@@ -178,10 +189,8 @@ app.post('/api/events/:id/cancel', (req, res) => {
   const index = slot.signups.findIndex(s => s.toLowerCase() === name.toLowerCase());
   if (index === -1) return res.status(404).json({ error: 'Signup not found' });
 
-  // Remove signup
   slot.signups.splice(index, 1);
 
-  // Promote from waitlist if available
   if (slot.waitlist && slot.waitlist.length > 0) {
     const promoted = slot.waitlist.shift();
     slot.signups.push(promoted);
