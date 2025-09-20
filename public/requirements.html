@@ -1,62 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MHS Student Council Requirements</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .requirements-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    .requirements-table th, .requirements-table td {
-      border: 1px solid #ccc;
-      padding: 16px;
-      text-align: left;
-    }
-
-    .requirements-table th {
-      background-color: #f0f0f0;
-      font-weight: bold;
-    }
-
-    .requirements-table tr:nth-child(even) {
-      background-color: #fafafa;
-    }
-
-    .note {
-      margin-top: 30px;
-      font-size: 0.95rem;
-      color: #555;
-    }
-
-    @media (max-width: 600px) {
-      .requirements-table th, .requirements-table td {
-        padding: 12px;
-        font-size: 14px;
-      }
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MHS Student Council - Committees</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header><a href="/" style="color: inherit; text-decoration: none;">MHS Student Council</a></header>
   <!-- Ttiel -->
   <nav class="top-nav">
     <div class="nav-left">
       <a href="/" class="logo">MHS Student Council</a>
-  </nav>
+    </div>
+  </nav>  
 
   <!-- Sidebar -->
   <aside class="sidebar">
-    <a href="index.html">Member Home</a>
-    <a href="#">Announcements</a>
-    <a href="eventlist.html">Events</a>
-    <a href="#">Committees</a>
-    <a href="#">Documents</a>
-    <a href="directory.html">Directory</a>
-    <a href="accounts.html">Service Hours</a>
+    <div class="sidebar-links">
+      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
+      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+      <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
+      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+      <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
+      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
+    </div>
+  
+    <div class="sidebar-footer">
+      <a href="login.html" class="admin-link"><i class="fas fa-user-circle"></i> <span>Admin</span></a>
+    </div>
   </aside>
 <div class="container">
   <h1>Membership Requirements</h1>
@@ -84,7 +60,8 @@
     </tbody>
   </table>
 
-  <p>Additionally no representative can have any disciplinary action of any kind against them.</p>
+  <p class="posttable">
+    Additionally no representative can have any disciplinary action of any kind against them.</p>
 
   <p class="note">
     If you have any questions or need assistance, please reach out to a Student Council officer.

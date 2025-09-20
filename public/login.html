@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f9fafb;
+    }
+
+    .login-container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+
+    input {
+      margin-top: 1rem;
+    }
+
+    button {
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+      color: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Admin Login</h2>
+    <input type="password" id="password" placeholder="Enter password">
+    <button id="loginBtn">Login</button>
+    <p id="error" style="color: red; margin-top: 0.5rem; display:none;">Incorrect password</p>
+  </div>
+
+  <script>
+    const loginBtn = document.getElementById('loginBtn');
+    const passwordInput = document.getElementById('password');
+    const error = document.getElementById('error');
+
+    const HARD_CODED_PASSWORD = "password"; // change to whatever you want
+
+    loginBtn.addEventListener('click', () => {
+      if(passwordInput.value === HARD_CODED_PASSWORD){
+        window.location.href = "admin.html";
+      } else {
+        error.style.display = "block";
+      }
+    });
+
+    // Optional: allow Enter key to submit
+    passwordInput.addEventListener('keyup', (e) => {
+      if(e.key === "Enter") loginBtn.click();
+    });
+  </script>
+</body>
+</html>

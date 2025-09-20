@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Account - MHS Student Council</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    .container { max-width: 1000px; margin: 2rem auto; padding: 1rem; }
+    h1 { color: #b91c1c; text-align: center; margin-bottom: 2rem; }
+    .search-bar { width: 100%; padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 2rem; font-size: 1rem; }
+    .account-card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+    .account-card h3 { margin: 0 0 0.5rem; }
+    .account-card p { margin: 0.3rem 0; }
+    .progress-container { background: #f3f4f6; border-radius: 12px; overflow: hidden; height: 20px; margin: 0.5rem 0; }
+    .progress-bar { background-image: linear-gradient(90deg, #b91c1c, #f87171); height: 100%; width: 0%; transition: width 0.4s ease; }
+    @media (max-width: 600px) {
+      .account-card { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Master Service Hours</h1>
+  <input type="text" id="searchInput" class="search-bar" placeholder="Search by name, position..." />
+
+  <!-- Slider for hours filter -->
+  <label for="hoursFilter">Show members with ≤ <span id="hoursValue">30</span> hours:</label>
+  <input type="range" id="hoursFilter" min="0" max="30" value="30" style="width:100%; margin-bottom:1rem;" />
+
+  <!-- Table headers for sorting -->
+  <div class="table-headers" style="display:flex; font-weight:bold; gap:1rem; margin-bottom:1rem; cursor:pointer;">
+    <div data-field="Name" style="flex:2;">Name</div>
+    <div data-field="Position" style="flex:2;">Position</div>
+    <div data-field="Service hours" style="flex:1;">Service Hours</div>
+    <div data-field="Meeting Credit" style="flex:1;">Meetings</div>
+  </div>
+
+  <div id="accountsList"></div>
+</div>
+
+  <script src="js/service.js"></script>
+</body>
+</html>

@@ -80,6 +80,9 @@ html, body {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+  margin-left: calc(220px + (100% - 220px - 900px)/2); 
+  margin-right: auto;
 }
 
 /* ===== Buttons ===== */
@@ -436,8 +439,20 @@ main > p {
   }
   .container {
     margin-left: 0;
+    margin-right: 0;
+    padding: 1rem;
   }
 }
+
+@media (max-width: 600px) {
+  .event-card {
+    display: block; /* stack vertically */
+  }
+  .event-date {
+    margin-bottom: 10px;
+  }
+}
+
 
 .spacer {
   height: 2rem;
@@ -480,4 +495,173 @@ main > p {
 .directory-card .role {
   font-weight: 600;
   color: #111;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem; /* space between icon and text */
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem;
+  border-radius: 6px;
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.sidebar a:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.sidebar a i {
+  min-width: 20px; /* aligns icons in a column */
+  text-align: center;
+}
+
+/* ===== Tables ===== */
+    .requirements-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .requirements-table th, .requirements-table td {
+      border: 1px solid #ccc;
+      padding: 16px;
+      text-align: left;
+    }
+
+    .requirements-table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+
+    .requirements-table tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    .note {
+      margin-top: 30px;
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+.posttable {
+  margin-top: 10px;
+}
+
+.table-headers {
+  display: flex;
+  justify-content: space-between;
+  background: #f3f4f6;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.2s ease;
+}
+
+.header:hover {
+  color: #b91c1c;
+}
+
+.sort-arrow {
+  display: inline-block;
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+/* Arrow rotation for ascending/descending */
+.sort-arrow.asc { transform: rotate(180deg); }
+.sort-arrow.desc { transform: rotate(0deg); }
+
+.account-card {
+  border-left: 5px solid #b91c1c;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.account-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.date-scroll {
+  display: flex;
+  overflow-x: auto;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  gap: 8px;
+}
+
+.date-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.date-scroll::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 3px;
+}
+
+.date-scroll button {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 60px;
+  border: 2px solid transparent; /* default border */
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.date-scroll button span.day-num {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.date-scroll button span.weekday {
+  font-size: 0.8em;
+  color: #555;
+}
+
+/* Dates with events */
+.date-scroll button.has-event {
+  cursor: pointer;
+  background-color: #ffb8b3;
+}
+
+.date-scroll button.has-event:hover,
+.date-scroll button.has-event.active {
+  background-color: #b91c1c;
+  color: white;
+}
+
+/* Highlight today */
+.date-scroll button.today {
+  border-color: #FF4136; /* red border for today */
+}
+
+
+.event-card {
+  margin-bottom: 30px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.event-date-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.1em;
 }

@@ -13,6 +13,7 @@ const EVENTS_FILE = path.join(__dirname, 'events.json');
 
 // --- Static files ---
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json()); // <-- add this line
 
 // --- API route to get user data from Google Sheets ---
 app.get('/api/userinfo', async (req, res) => {
@@ -51,28 +52,50 @@ app.get('/api/events/:id', (req, res) => {
   res.json(event);
 });
 
+// Create or update event
 app.post('/api/events', (req, res) => {
-  const { title, date, location, description, contactName, contactEmail, scheduleType, timeSlots } = req.body;
-  const events = readEvents();
-  const newEvent = {
-    id: uuidv4(),
-    title,
-    date,
-    location,
-    description,
-    contactName,
-    contactEmail,
-    scheduleType,
-    timeSlots: timeSlots.map(slot => ({
-      time: slot.time,
-      hours: slot.hours,
-      maxSpots: Number(slot.maxSpots),
-      signups: []
-    }))
-  };
-  events.push(newEvent);
-  writeEvents(events);
-  res.status(201).json(newEvent);
+  try {
+    const { title, date, location, description, contactName, contactEmail, scheduleType, timeSlots } = req.body;
+
+    // Basic validation
+    if (!title || !date || !location || !description || !contactName || !contactEmail || !scheduleType) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    if (!Array.isArray(timeSlots) || timeSlots.length === 0) {
+      return res.status(400).json({ error: 'Time slots are required' });
+    }
+
+    // Validate timeSlots
+    const sanitizedSlots = timeSlots.map(slot => ({
+      time: slot.time || 'Unknown',
+      hours: Number(slot.hours) || 0,
+      maxSpots: Number(slot.maxSpots) || 0,
+      signups: Array.isArray(slot.signups) ? slot.signups : [],
+      waitlist: Array.isArray(slot.waitlist) ? slot.waitlist : []
+    }));
+
+    const events = readEvents();
+    const newEvent = {
+      id: uuidv4(),
+      title,
+      date,
+      location,
+      description,
+      contactName,
+      contactEmail,
+      scheduleType,
+      timeSlots: sanitizedSlots
+    };
+
+    events.push(newEvent);
+    writeEvents(events);
+
+    res.status(201).json(newEvent);
+  } catch (err) {
+    console.error('Error creating event:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.post('/api/events/:id/signup', (req, res) => {

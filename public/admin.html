@@ -1,228 +1,194 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MHS Student Council - Admin</title>
-  <link rel="stylesheet" href="../style.css" />
-  <style>
-    /* Calendar styling */
-    .calendar {
-      max-width: 350px;
-      margin: 0 auto;
-      user-select: none;
-    }
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .calendar-header button {
-      background: #b91c1c;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .calendar-weekdays {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      text-align: center;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-    .calendar-days {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      text-align: center;
-      gap: 5px;
-    }
-    .calendar-day {
-      padding: 8px 0;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .calendar-day:hover {
-      background: #fee2e2;
-    }
-    .calendar-day.selected {
-      background: #b91c1c;
-      color: white;
-      font-weight: bold;
-    }
-    .calendar-day.disabled {
-      color: #cbd5e1;
-      cursor: default;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MHS Student Council - Admin Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="style.css" />
+<style>
+  body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+  .container { max-width: 1200px; margin: 5rem auto; padding: 1rem; }
+  h1 { color: #b91c1c; text-align: center; margin-bottom: 2rem; }
 
-    /* Big buttons for schedule type */
-    .schedule-type-buttons {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .schedule-type-btn {
-      flex: 1;
-      padding: 20px;
-      background: #b91c1c;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    .schedule-type-btn:hover {
-      background: #7f1d1d;
-    }
-    .hidden {
-      display: none;
-    }
+  /* Stats Cards */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card { 
+    background: #f9fafb; 
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .stat-card h2 { margin: 0; font-size: 2rem; color: #b91c1c; }
+  .stat-card p { margin: 0.5rem 0 0; color: #555; font-weight: 600; }
 
-    /* Make modal scrollable and keep buttons visible */
-    .modal-content {
-      max-height: 90vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-    .form-navigation {
-      position: sticky;
-      bottom: 0;
-      background: white;
-      padding: 1rem 0;
-      border-top: 1px solid #ddd;
-      display: flex;
-      justify-content: space-between;
-    }
-  </style>
+  /* Quick Actions */
+  .actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; justify-content: center; }
+  .action-btn { background: #b91c1c; color: white; padding: 1rem 1.5rem; border-radius: 10px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s ease; }
+  .action-btn:hover { background: #7f1d1d; }
+
+  /* Recent Activity Table */
+  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+  th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+  th { background: #b91c1c; color: white; font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+
+  /* Search */
+  .search-bar { width: 100%; padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1rem; font-size: 1rem; }
+
+  @media (max-width: 600px) {
+    .actions { flex-direction: column; }
+  }
+</style>
 </head>
 <body>
-  <header><a href="/" style="color: inherit; text-decoration: none;">MHS Student Council - Admin</a></header>
-  
-    <!-- Ttiel -->
-    <nav class="top-nav">
-      <div class="nav-left">
-        <a href="/" class="logo">MHS Student Council</a>
-    </nav>
-  
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <a href="index.html">Member Home</a>
-      <a href="#">Announcements</a>
-      <a href="eventlist.html">Events</a>
-      <a href="#">Committees</a>
-      <a href="#">Documents</a>
-      <a href="directory.html">Directory</a>
-      <a href="accounts.html">Service Hours</a>
-    </aside>
+  <!-- Ttiel -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="/" class="logo">MHS Student Council</a>
+    </div>
+  </nav>  
 
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-links">
+      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
+      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+      <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
+      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+      <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
+      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
+    </div>
+  
+    <div class="sidebar-footer">
+      <a href="login.html" class="admin-link"><i class="fas fa-user-circle"></i> <span>Admin</span></a>
+    </div>
+  </aside>
+  
+  <div class="spacer">
+  
   <div class="container">
     <h1>Admin Dashboard</h1>
-    <button id="createBtn">+ Create New Event</button>
-    <div id="eventsList"></div>
-  </div>
 
-  <!-- Create Event Modal -->
-  <div class="modal" id="createModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeCreateModal">&times;</span>
-      <h2>Create New Event</h2>
-
-      <!-- Progress Bar -->
-      <div class="progress-bar">
-        <div class="step active" data-step="1">Details</div>
-        <div class="step" data-step="2">Date</div>
-        <div class="step" data-step="3">Schedule</div>
-        <div class="step" data-step="4">Review</div>
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h2 id="totalMembers">0</h2>
+        <p>Total Members</p>
       </div>
-
-      <form id="createEventForm">
-
-        <!-- Step 1: Details -->
-        <div class="page" data-page="1">
-          <label>Event Title</label>
-          <input type="text" id="title" required />
-          <label>Location</label>
-          <input type="text" id="location" required />
-          <label>Description</label>
-          <textarea id="description" required></textarea>
-          <label>Contact Name</label>
-          <input type="text" id="contactName" required />
-          <label>Contact Email</label>
-          <input type="email" id="contactEmail" required />
-        </div>
-
-        <!-- Step 2: Date -->
-        <div class="page" data-page="2" style="display:none;">
-          <div id="calendar" class="calendar"></div>
-          <input type="hidden" id="date" required />
-        </div>
-
-        <!-- Step 3: Schedule -->
-        <div class="page" data-page="3" style="display:none;">
-          <h3>Step 3: Choose Schedule Type</h3>
-          <div class="form-group">
-            <label>Select Schedule Type</label>
-            <div class="schedule-type-container">
-              <button type="button" id="btnTimeSlots" class="schedule-type-btn">Time Slots</button>
-              <button type="button" id="btnLunchPeriods" class="schedule-type-btn">Lunch Periods</button>
-            </div>
-          </div>
-          <!-- Time Slots Section -->
-          <div id="timeSlotsSection" style="display: none;">
-            <div id="timeSlotsContainer"></div>
-            <button type="button" id="addSlotBtn">Add Time Slot</button>
-            <button type="button" id="removeSlotBtn">Remove Last Slot</button>
-          </div>
-          <!-- Lunch Periods Section -->
-          <div id="lunchPeriodsSection" style="display: none;">
-            <div>
-              <h4>5A Lunch</h4>
-              <label>Max Spots</label>
-              <input type="number" id="lunch5aMax" min="1" required>
-              <label>Service Hours</label>
-              <input type="number" id="lunch5aHours" min="1" required>
-            </div>
-            <div>
-              <h4>5B Lunch</h4>
-              <label>Max Spots</label>
-              <input type="number" id="lunch5bMax" min="1" required>
-              <label>Service Hours</label>
-              <input type="number" id="lunch5bHours" min="1" required>
-            </div>
-          </div>        
-        </div>
-
-        <!-- Step 4: Review -->
-        <div class="page" data-page="4" style="display:none;">
-          <h3>Review Your Event</h3>
-          <pre id="reviewContent" style="white-space: pre-wrap;"></pre>
-        </div>
-
-        <!-- Navigation buttons -->
-        <div class="form-navigation">
-          <button type="button" id="prevBtn" disabled>Previous</button>
-          <button type="button" id="nextBtn">Next</button>
-          <button type="submit" id="submitBtn" style="display:none;">Create Event</button>
-        </div>
-      </form>
+      <div class="stat-card">
+        <h2 id="totalHours">0</h2>
+        <p>Total Service Hours</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="belowHours">0</h2>
+        <p>Members Below Hours</p>
+      </div>
+      <div class="stat-card">
+        <h2 id="upcomingEvents">0</h2>
+        <p>Upcoming Events</p>
+      </div>
     </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="actions">
+      <a href="create-event.html" class="action-btn"><i class="fas fa-plus-circle"></i> Create Event</a>
+      <a href="service.html" class="action-btn"><i class="fas fa-stopwatch"></i> View Service Hours</a>
+      <a href="#" class="action-btn"><i class="fas fa-file-csv"></i> Export CSV</a>
+    </div>
+
+    <!-- Search -->
+    <input type="text" id="memberSearch" class="search-bar" placeholder="Search members..." />
+
+    <!-- Recent Activity Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Service Hours</th>
+          <th>Meeting Credit</th>
+          <th>Position</th>
+          <th>Last Event</th>
+        </tr>
+      </thead>
+      <tbody id="activityTable">
+        <!-- JS fills this -->
+      </tbody>
+    </table>
   </div>
 
-  <!-- View Sign-Ups Modal -->
-  <div class="modal" id="signupsModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeSignupsModal">&times;</span>
-      <h2 id="signupsTitle">Sign-Ups</h2>
-      <div id="signupsContent"></div>
-    </div>
-  </div>
+  <script>
+    const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9nsgWRuANHKqhFPeAWN88MvusJSzkQtcm4nUdaVIjAky1WifmSchquUEg0BV5r1dEvedKnKjtyiwC/pub?gid=0&single=true&output=csv";
+    const REQUIRED_HOURS = 30;
+    const REQUIRED_MEETINGS = 10;
 
-  <script src="js/admin.js"></script>
+    const totalMembersEl = document.getElementById('totalMembers');
+    const totalHoursEl = document.getElementById('totalHours');
+    const belowHoursEl = document.getElementById('belowHours');
+    const activityTable = document.getElementById('activityTable');
+    const memberSearch = document.getElementById('memberSearch');
+
+    let accounts = [];
+
+    async function fetchAccounts() {
+      const url = "https://api.allorigins.win/raw?url=" + encodeURIComponent(sheetCSV);
+      const res = await fetch(url);
+      const csvText = await res.text();
+
+      const rows = csvText.split("\n").filter(r => r.trim() !== "");
+      const headers = rows[0].split(",").map(h => h.trim());
+
+      accounts = rows.slice(1).map(row => {
+        const values = row.split(",").map(v => v.trim());
+        let obj = {};
+        headers.forEach((h, i) => obj[h] = values[i]);
+        return obj;
+      });
+
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      const totalMembers = accounts.length;
+      const totalHours = accounts.reduce((sum, a) => sum + Number(a["Service hours"] || 0), 0);
+      const belowHours = accounts.filter(a => Number(a["Service hours"] || 0) < REQUIRED_HOURS).length;
+
+      totalMembersEl.textContent = totalMembers;
+      totalHoursEl.textContent = totalHours;
+      belowHoursEl.textContent = belowHours;
+
+      displayActivity(accounts);
+    }
+
+    function displayActivity(list) {
+      activityTable.innerHTML = "";
+      list.forEach(a => {
+        const lastEvent = a["Last Event"] || "-";
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${a["Name"]}</td>
+          <td>${a["Service hours"] || 0}</td>
+          <td>${a["Meeting Credit"] || 0}</td>
+          <td>${a["Position"] || "-"}</td>
+          <td>${lastEvent}</td>
+        `;
+        activityTable.appendChild(tr);
+      });
+    }
+
+    // Filter/search
+    memberSearch.addEventListener('input', () => {
+      const query = memberSearch.value.toLowerCase();
+      const filtered = accounts.filter(a => 
+        a["Name"].toLowerCase().includes(query) ||
+        a["Position"].toLowerCase().includes(query)
+      );
+      displayActivity(filtered);
+    });
+
+    fetchAccounts();
+  </script>
 </body>
 </html>

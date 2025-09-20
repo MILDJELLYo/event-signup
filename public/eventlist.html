@@ -7,29 +7,39 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<header><a href="/" style="color: inherit; text-decoration: none;">MHS Student Council</a></header>
-
   <!-- Ttiel -->
   <nav class="top-nav">
     <div class="nav-left">
       <a href="/" class="logo">MHS Student Council</a>
-  </nav>
+    </div>
+  </nav>  
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <a href="index.html">Member Home</a>
-      <a href="#">Announcements</a>
-      <a href="eventlist.html">Events</a>
-      <a href="#">Committees</a>
-      <a href="#">Documents</a>
-      <a href="directory.html">Directory</a>
-      <a href="accounts.html">Service Hours</a>
-    </aside>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-links">
+      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
+      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+      <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
+      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+      <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
+      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
+    </div>
+  
+    <div class="sidebar-footer">
+      <a href="login.html" class="admin-link"><i class="fas fa-user-circle"></i> <span>Admin</span></a>
+    </div>
+  </aside>
 
 <div class="container">
   <h1>Upcoming Events</h1>
+  <!-- Date scroll bar -->
+  <div id="dateScroll" class="date-scroll"></div>
+
+  <!-- Events list -->
   <div id="eventsList"></div>
 </div>
+
 <script src="js/index.js"></script>
 </body>
 </html>

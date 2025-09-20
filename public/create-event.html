@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MHS Student Council - Admin</title>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    /* Calendar styling */
+    .calendar {
+      max-width: 350px;
+      margin: 0 auto;
+      user-select: none;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .calendar-header button {
+      background: #b91c1c;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      gap: 5px;
+    }
+    .calendar-day {
+      padding: 8px 0;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .calendar-day:hover {
+      background: #fee2e2;
+    }
+    .calendar-day.selected {
+      background: #b91c1c;
+      color: white;
+      font-weight: bold;
+    }
+    .calendar-day.disabled {
+      color: #cbd5e1;
+      cursor: default;
+    }
+
+    /* Big buttons for schedule type */
+    .schedule-type-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .schedule-type-btn {
+      flex: 1;
+      padding: 20px;
+      background: #b91c1c;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .schedule-type-btn:hover {
+      background: #7f1d1d;
+    }
+    .hidden {
+      display: none;
+    }
+
+    /* Make modal scrollable and keep buttons visible */
+    .modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-navigation {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 1rem 0;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <!-- Ttiel -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="/" class="logo">MHS Student Council</a>
+    </div>
+  </nav>  
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-links">
+      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
+      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+      <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
+      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+      <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
+      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
+    </div>
+  
+    <div class="sidebar-footer">
+      <a href="login.html" class="admin-link"><i class="fas fa-user-circle"></i> <span>Admin</span></a>
+    </div>
+  </aside>
+
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    <button id="createBtn">+ Create New Event</button>
+    <div id="eventsList"></div>
+  </div>
+
+  <!-- Create Event Modal -->
+  <div class="modal" id="createModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeCreateModal">&times;</span>
+      <h2>Create New Event</h2>
+
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div class="step active" data-step="1">Details</div>
+        <div class="step" data-step="2">Date</div>
+        <div class="step" data-step="3">Schedule</div>
+        <div class="step" data-step="4">Review</div>
+      </div>
+
+      <form id="createEventForm">
+
+        <!-- Step 1: Details -->
+        <div class="page" data-page="1">
+          <label>Event Title</label>
+          <input type="text" id="title" required />
+          <label>Location</label>
+          <input type="text" id="location" required />
+          <label>Description</label>
+          <textarea id="description" required></textarea>
+          <label>Contact Name</label>
+          <input type="text" id="contactName" required />
+          <label>Contact Email</label>
+          <input type="email" id="contactEmail" required />
+        </div>
+
+        <!-- Step 2: Date -->
+        <div class="page" data-page="2" style="display:none;">
+          <div id="calendar" class="calendar"></div>
+          <input type="hidden" id="date" required />
+        </div>
+
+        <!-- Step 3: Schedule -->
+        <div class="page" data-page="3" style="display:none;">
+          <h3>Step 3: Choose Schedule Type</h3>
+          <div class="form-group">
+            <label>Select Schedule Type</label>
+            <div class="schedule-type-container">
+              <button type="button" id="btnTimeSlots" class="schedule-type-btn">Time Slots</button>
+              <button type="button" id="btnLunchPeriods" class="schedule-type-btn">Lunch Periods</button>
+            </div>
+          </div>
+          <!-- Time Slots Section -->
+          <div id="timeSlotsSection" style="display: none;">
+            <div id="timeSlotsContainer"></div>
+            <button type="button" id="addSlotBtn">Add Time Slot</button>
+            <button type="button" id="removeSlotBtn">Remove Last Slot</button>
+          </div>
+          <!-- Lunch Periods Section -->
+          <div id="lunchPeriodsSection" style="display: none;">
+            <div>
+              <h4>5A Lunch</h4>
+              <label>Max Spots</label>
+              <input type="number" id="lunch5aMax" min="1" required>
+              <label>Service Hours</label>
+              <input type="number" id="lunch5aHours" min="1" required>
+            </div>
+            <div>
+              <h4>5B Lunch</h4>
+              <label>Max Spots</label>
+              <input type="number" id="lunch5bMax" min="1" required>
+              <label>Service Hours</label>
+              <input type="number" id="lunch5bHours" min="1" required>
+            </div>
+          </div>        
+        </div>
+
+        <!-- Step 4: Review -->
+        <div class="page" data-page="4" style="display:none;">
+          <h3>Review Your Event</h3>
+          <pre id="reviewContent" style="white-space: pre-wrap;"></pre>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="form-navigation">
+          <button type="button" id="prevBtn" disabled>Previous</button>
+          <button type="button" id="nextBtn">Next</button>
+          <button type="submit" id="submitBtn" style="display:none;">Create Event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Sign-Ups Modal -->
+  <div class="modal" id="signupsModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeSignupsModal">&times;</span>
+      <h2 id="signupsTitle">Sign-Ups</h2>
+      <div id="signupsContent"></div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MHS Student Council - Directory</title>
+  <title>MHS Student Council - Committees</title>
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -11,13 +11,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Ttiel -->
-  <nav class="top-nav">
-    <div class="nav-left">
-      <a href="/" class="logo">MHS Student Council</a>
-    </div>
-  </nav>  
-
+    <!-- Ttiel -->
+    <nav class="top-nav">
+      <div class="nav-left">
+        <a href="/" class="logo">MHS Student Council</a>
+      </div>
+    </nav>  
+  
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-links">
@@ -37,22 +37,19 @@
 
   <!-- Main Content -->
   <main class="container">
-    <h1>Student Council Directory</h1>
-    <p>Search for members by name, position, or grade.</p>
+    <h1>Student Council Committees</h1>
+    <p>Select a committee to view its members.</p>
 
-    <!-- Search Bar -->
-    <input
-      type="text"
-      id="directorySearch"
-      placeholder="Search by name, position, or grade..."
-      style="width: 100%; padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1.5rem; font-size: 1rem;"
-    />
+    <!-- Committee Dropdown -->
+    <select id="committeeSelect" style="width: 100%; padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1.5rem; font-size: 1rem;">
+      <option value="">-- Select a Committee --</option>
+    </select>
 
-    <div id="directoryList" class="directory-list">
-      <!-- Directory entries will be loaded here via JS -->
+    <div id="committeeList" class="directory-list">
+      <!-- Committee members will be loaded here -->
     </div>
   </main>
 
-  <script src="js/directory.js"></script>
+  <script src="js/committees.js"></script>
 </body>
 </html>
