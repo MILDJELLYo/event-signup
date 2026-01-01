@@ -239,47 +239,6 @@ textarea {
   color: #b91c1c;
 }
 
-/* ===== Modals ===== */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background: rgba(0,0,0,0.4);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 600px;
-  width: 90%;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-  animation: fadeIn 0.3s ease;
-}
-
-.close-btn {
-  float: right;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #9ca3af;
-}
-
-.close-btn:hover {
-  color: #b91c1c;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 /* ===== Calendar ===== */
 .calendar {
   max-width: 350px;
@@ -664,4 +623,102 @@ main > p {
   font-weight: bold;
   margin-bottom: 10px;
   font-size: 1.1em;
+}
+
+.admin-dropdown {
+  position: relative;
+}
+
+
+.dropdown-icon {
+  transition: transform 0.3s ease;
+}
+
+.dropdown-menu {
+  display: none;
+  flex-direction: column;
+  margin-left: 1rem;
+}
+
+.dropdown-menu a {
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.admin-dropdown.open .dropdown-menu {
+  display: flex;
+}
+
+.admin-dropdown.open .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+/* ===== Executive Board ===== */
+.executive-board {
+  margin-top: 2rem;
+}
+
+.board-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.board-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  width: 200px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.board-card h3 {
+  margin-bottom: 0.2rem;
+  color: #b91c1c;
+}
+
+.board-card p {
+  color: #555;
+  font-weight: 500;
+}
+
+/* ===== Committees ===== */
+.committees {
+  margin-top: 3rem;
+}
+
+.committee-table {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.committee-column {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  min-width: 160px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.committee-column h4 {
+  color: #b91c1c;
+  margin-bottom: 0.5rem;
+}
+
+.committee-column p {
+  margin: 0.3rem 0;
+  color: #555;
+}
+
+.committee-column p strong {
+  font-weight: 600;
 }

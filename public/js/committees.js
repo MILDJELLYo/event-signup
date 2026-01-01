@@ -1,6 +1,15 @@
 const committeeList = document.getElementById('committeeList');
 const committeeSelect = document.getElementById('committeeSelect');
 
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/login.html'); // redirect if not logged in
+  }
+  next();
+}
+
+
+
 // Replace with your CSV URL
 const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9nsgWRuANHKqhFPeAWN88MvusJSzkQtcm4nUdaVIjAky1WifmSchquUEg0BV5r1dEvedKnKjtyiwC/pub?gid=411848997&single=true&output=csv";
 

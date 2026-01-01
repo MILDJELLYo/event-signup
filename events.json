@@ -1,1 +1,59 @@
-[]
+[
+  {
+    "id": "9a18c79e-a8fa-448b-94eb-0c571706b984",
+    "title": "Hoco Cleanup",
+    "date": "2026-01-01",
+    "location": "Ca",
+    "description": "Te",
+    "contactName": "asdf",
+    "contactEmail": "email@email.com",
+    "scheduleType": "lunchPeriods",
+    "timeSlots": [
+      {
+        "time": "5A Lunch",
+        "hours": 2,
+        "maxSpots": 2,
+        "signups": [
+          "Hope Bryant",
+          "Payton Collins"
+        ],
+        "waitlist": []
+      },
+      {
+        "time": "5B Lunch",
+        "hours": 2,
+        "maxSpots": 2,
+        "signups": [],
+        "waitlist": []
+      }
+    ]
+  },
+  {
+    "id": "0d2d9f7d-ded9-49c5-9c6e-aeb6ee2f45f6",
+    "title": "safd",
+    "date": "2026-01-03",
+    "location": "asdf",
+    "description": "sadf",
+    "contactName": "asdf",
+    "contactEmail": "email@email.com",
+    "scheduleType": "lunchPeriods",
+    "timeSlots": [
+      {
+        "time": "5A Lunch",
+        "hours": 2,
+        "maxSpots": 2,
+        "signups": [
+          "Henry Lanier"
+        ],
+        "waitlist": []
+      },
+      {
+        "time": "5B Lunch",
+        "hours": 2,
+        "maxSpots": 2,
+        "signups": [],
+        "waitlist": []
+      }
+    ]
+  }
+]

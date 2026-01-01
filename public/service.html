@@ -1,46 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Account - MHS Student Council</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
-    .container { max-width: 1000px; margin: 2rem auto; padding: 1rem; }
-    h1 { color: #b91c1c; text-align: center; margin-bottom: 2rem; }
-    .search-bar { width: 100%; padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 2rem; font-size: 1rem; }
-    .account-card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
-    .account-card h3 { margin: 0 0 0.5rem; }
-    .account-card p { margin: 0.3rem 0; }
-    .progress-container { background: #f3f4f6; border-radius: 12px; overflow: hidden; height: 20px; margin: 0.5rem 0; }
-    .progress-bar { background-image: linear-gradient(90deg, #b91c1c, #f87171); height: 100%; width: 0%; transition: width 0.4s ease; }
-    @media (max-width: 600px) {
-      .account-card { padding: 1rem; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MHS Student Council - Service Hours</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="style.css" />
+<style>
+ #master-service-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+#master-service-table th, #master-service-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
+
+#master-service-table th {
+  background: #f3f4f6;
+  font-weight: 600;
+}
+
+#master-service-table tr:nth-child(even) {
+  background: #fafafa;
+}
+
+#master-service-table tr:hover {
+  background: #fee2e2;
+}
+
+#master-service-table td input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+#add-row-btn, #save-btn {
+  background: #b91c1c;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  margin-right: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#add-row-btn:hover, #save-btn:hover {
+  background: #991b1b;
+}
+  
+  .modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  width: 90%;
+  max-width: 700px;
+  padding: 1.5rem;
+  border-radius: 12px;
+  position: relative;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.progress-wrapper {
+  background: #e5e7eb;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0.75rem 0 1.25rem;
+}
+
+#modalProgressBar {
+  height: 100%;
+  width: 0%;
+  background: #16a34a;
+  transition: width 0.3s ease;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-table th,
+.modal-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+
+</style>
 </head>
 <body>
-<div class="container">
-  <h1>Master Service Hours</h1>
-  <input type="text" id="searchInput" class="search-bar" placeholder="Search by name, position..." />
 
-  <!-- Slider for hours filter -->
-  <label for="hoursFilter">Show members with ≤ <span id="hoursValue">30</span> hours:</label>
-  <input type="range" id="hoursFilter" min="0" max="30" value="30" style="width:100%; margin-bottom:1rem;" />
+  <!-- Ttiel -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="/" class="logo">MHS Student Council</a>
+    </div>
+  </nav> 
 
-  <!-- Table headers for sorting -->
-  <div class="table-headers" style="display:flex; font-weight:bold; gap:1rem; margin-bottom:1rem; cursor:pointer;">
-    <div data-field="Name" style="flex:2;">Name</div>
-    <div data-field="Position" style="flex:2;">Position</div>
-    <div data-field="Service hours" style="flex:1;">Service Hours</div>
-    <div data-field="Meeting Credit" style="flex:1;">Meetings</div>
+  <!-- ===== Sidebar ===== -->
+  <aside class="sidebar">
+        <a href="index.html">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to site
+    </a>
+    
+    <a href="admin.html">
+      <i class="fas fa-gauge"></i>
+      Dashboard
+    </a>
+
+    <a href="admin-members.html">
+      <i class="fas fa-users"></i>
+      Manage Members
+    </a>
+
+    <a href="create-event.html">
+      <i class="fas fa-calendar-plus"></i>
+      Manage Events
+    </a>
+
+    <a href="service.html">
+      <i class="fas fa-clock"></i>
+      Service Hours
+    </a>
+  </aside>
+
+  <!-- ===== Main Content ===== -->
+  <main class="container">
+    <h1><i class="fas fa-clock"></i> Manage Service Hours</h1>
+    <p>Easy access to view and edit all member service hours</p>
+
+<table id="master-service-table">
+<thead>
+  <tr>
+    <th>Name</th>
+    <th>Position</th>
+    <th>Service hours</th>
+    <th>Meeting Credit</th>
+  </tr>
+</thead>
+  <tbody></tbody>
+</table>
+
+  </main>
+  
+  <!-- Member Detail Modal -->
+<div id="memberModal" class="modal-overlay">
+  <div class="modal">
+    <button id="closeModal" class="close-btn">&times;</button>
+
+    <h2 id="modalName">Member Name</h2>
+
+    <div class="modal-grid">
+      <div><strong>Email:</strong> <span id="modalEmail"></span></div>
+      <div><strong>Position:</strong> <span id="modalPosition"></span></div>
+      <div><strong>Service Hours:</strong> <span id="modalHours"></span></div>
+      <div><strong>Meeting Credit:</strong> <span id="modalMeetings"></span></div>
+    </div>
+
+    <div class="progress-wrapper">
+      <div id="modalProgressBar"></div>
+    </div>
+
+    <h3>Service Events</h3>
+    <table class="modal-table">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Hours</th>
+        </tr>
+      </thead>
+      <tbody id="modalEvents"></tbody>
+    </table>
   </div>
-
-  <div id="accountsList"></div>
 </div>
 
-  <script src="js/service.js"></script>
+  
+<script src="js/service.js" defer></script>
+  
 </body>
 </html>

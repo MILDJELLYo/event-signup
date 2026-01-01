@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Registered Events - MHS Student Council</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <style>
+        /* Modal Styles */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 24px;
+      font-weight: bold;
+      color: #666;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+    }
+    
+    .close-btn:hover {
+      color: #000;
+    }
+    
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .modal form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .modal form select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .modal button.danger {
+      background-color: #dc2626;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .modal button.danger:hover {
+      background-color: #b91c1c;
+    }
+      </style>
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="/" class="logo">MHS Student Council</a>
+    </div>
+  </nav>  
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-links">
+      <!-- Member Links -->
+      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
+      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+      
+      <!-- Events Dropdown -->
+      <div class="sidebar-links dropdown-container">
+        <div class="admin-dropdown">
+          <a href="#" class="dropdown-toggle">
+            <i class="fas fa-folder"></i> <span>Events</span> 
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="eventlist.html"><i class="fas fa-calendar"></i> Upcoming Events</a>
+            <a href="registered-events.html"><i class="fas fa-calendar-check"></i> Registered Events</a>
+            <a href="https://forms.gle/ju3RsRBJV86HkvSK8"><i class="fas fa-square-check"></i> Check-in</a>
+          </div>
+        </div>
+      </div>
+      
+      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
+      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+      
+      <!-- Membership Dropdown -->
+      <div class="sidebar-links dropdown-container">
+        <div class="admin-dropdown">
+          <a href="#" class="dropdown-toggle">
+            <i class="fas fa-address-book"></i> <span>Membership</span> 
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="leadership.html"><i class="fas fa-chart-project"></i> Leadership</a>
+            <a href="directory.html"><i class="fas fa-address-book"></i> Directory</a>
+            <a href="awards.html"><i class="fas fa-medal"></i> Awards</a>
+          </div>
+        </div>
+      </div>
+      
+      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
+    </div>
+
+    <!-- Admin Dropdown -->
+    <div class="sidebar-links admin-links" style="display:none;">
+      <div class="admin-dropdown">
+        <a href="#" class="dropdown-toggle">
+          <i class="fas fa-user-shield"></i> <span>Admin</span> 
+          <i class="fas fa-chevron-down dropdown-icon"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="admin.html"><i class="fas fa-cogs"></i> Dashboard</a>
+          <a href="admin-members.html"><i class="fas fa-users-cog"></i> Manage Members</a>
+          <a href="create-event.html"><i class="fas fa-calendar-plus"></i> Manage Events</a>
+          <a href="service.html"><i class="fas fa-stopwatch"></i> Total Service Hours</a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1><i class="fas fa-calendar-check"></i> My Registered Events</h1>
+    
+    <!-- User Info Banner -->
+    <div style="background:#f1f5f9; border:1px solid #e5e7eb; padding:12px; border-radius:8px; margin-bottom:20px;">
+      <p style="margin:0;">
+        <strong>Signed up as:</strong> <span id="userName">Loading...</span>
+      </p>
+      <p style="margin:4px 0 0; font-size:14px; color:#64748b;">
+        <strong>Total Service Hours:</strong> <span id="totalHours">0</span> hours
+      </p>
+    </div>
+
+    <!-- Filter Options -->
+    <div style="display:flex; gap:1rem; margin-bottom:1.5rem; align-items:center;">
+      <label style="margin:0; display:flex; align-items:center; gap:0.5rem;">
+        <input type="checkbox" id="showPastEvents" style="width:auto;">
+        Show Past Events
+      </label>
+      
+      <label style="margin:0; display:flex; align-items:center; gap:0.5rem;">
+        <input type="checkbox" id="showWaitlist" style="width:auto;">
+        Show Waitlist Items
+      </label>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="text-align:center; padding:2rem; color:#6b7280;">
+      <i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:1rem;"></i>
+      <p>Loading your registered events...</p>
+    </div>
+
+    <!-- No Events State -->
+    <div id="noEventsState" style="display:none; text-align:center; padding:3rem; background:#f9fafb; border-radius:12px;">
+      <i class="fas fa-calendar-times" style="font-size:3rem; color:#cbd5e1; margin-bottom:1rem;"></i>
+      <h3 style="color:#64748b; margin-bottom:0.5rem;">No Registered Events</h3>
+      <p style="color:#94a3b8;">You haven't signed up for any events yet.</p>
+      <a href="eventlist.html" style="display:inline-block; margin-top:1rem; background:#b91c1c; color:white; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:500;">
+        Browse Upcoming Events
+      </a>
+    </div>
+
+    <!-- Events Container -->
+    <div id="eventsContainer"></div>
+  </div>
+
+  <!-- Cancel Modal -->
+  <div class="modal" id="cancelModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeCancelModal">&times;</span>
+      <h2>Cancel Registration</h2>
+      
+      <div id="cancelEventInfo" style="background:#f9fafb; padding:1rem; border-radius:8px; margin:1rem 0;">
+        <!-- Event info will be inserted here -->
+      </div>
+
+      <p style="color:#dc2626; font-weight:500; margin-bottom:1rem;">
+        <i class="fas fa-exclamation-triangle"></i> 
+        Are you sure you want to cancel this registration?
+      </p>
+
+      <div style="display:flex; gap:1rem; justify-content:flex-end;">
+        <button type="button" id="cancelModalCancel" style="background:#6b7280;">
+          No, Keep Registration
+        </button>
+        <button type="button" id="confirmCancel" class="danger">
+          Yes, Cancel Registration
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/registered-events.js"></script>
+  <script src="js/adminmenu.js"></script>
+  <script type="module" src="/js/auth-guard.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MHS Student Council - Members Area</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<!-- Ttiel -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <a href="/" class="logo">MHS Student Council</a>
+    </div>
+  </nav>  
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-links">
+    <!-- Member Links -->
+    <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
+    <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+    <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+    <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
+    <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+    <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
+    <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
+  </div>
+
+  <!-- Admin Dropdown -->
+  <div class="sidebar-links admin-links" style="display:none;">
+    <div class="admin-dropdown">
+      <a href="#" class="dropdown-toggle">
+        <i class="fas fa-user-shield"></i> <span>Admin</span> <i class="fas fa-chevron-down dropdown-icon"></i>
+      </a>
+      <div class="dropdown-menu">
+        <a href="admin.html"><i class="fas fa-cogs"></i> Dashboard</a>
+        <a href="admin-members.html"><i class="fas fa-users-cog"></i> Manage Members</a>
+        <a href="admin-events.html"><i class="fas fa-calendar-plus"></i> Manage Events</a>
+        <a href="admin-service.html"><i class="fas fa-stopwatch"></i> Total Service Hours</a>
+      </div>
+    </div>
+  </div>
+</aside>
+</body>
+</html>

@@ -7,117 +7,199 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="stylesheet" href="style.css" />
 <style>
-  body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
-  .container { max-width: 1200px; margin: 5rem auto; padding: 1rem; }
-  h1 { color: #b91c1c; text-align: center; margin-bottom: 2rem; }
+ #service-hours-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
 
-  /* Stats Cards */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-  .stat-card { 
-    background: #f9fafb; 
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    text-align: center;
-    padding: 1.5rem;
-  }
-  .stat-card h2 { margin: 0; font-size: 2rem; color: #b91c1c; }
-  .stat-card p { margin: 0.5rem 0 0; color: #555; font-weight: 600; }
+#service-hours-table th, #service-hours-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
 
-  /* Quick Actions */
-  .actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem; justify-content: center; }
-  .action-btn { background: #b91c1c; color: white; padding: 1rem 1.5rem; border-radius: 10px; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; transition: background 0.2s ease; }
-  .action-btn:hover { background: #7f1d1d; }
+#service-hours-table th {
+  background: #f3f4f6;
+  font-weight: 600;
+}
 
-  /* Recent Activity Table */
-  table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 2rem; }
-  th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
-  th { background: #b91c1c; color: white; font-weight: 600; }
-  tr:last-child td { border-bottom: none; }
+#service-hours-table tr:nth-child(even) {
+  background: #fafafa;
+}
 
-  /* Search */
-  .search-bar { width: 100%; padding: 0.6rem 1rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1rem; font-size: 1rem; }
+#service-hours-table tr:hover {
+  background: #fee2e2;
+}
 
-  @media (max-width: 600px) {
-    .actions { flex-direction: column; }
-  }
+#service-hours-table td input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+#add-row-btn, #save-btn {
+  background: #b91c1c;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  margin-right: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#add-row-btn:hover, #save-btn:hover {
+  background: #991b1b;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  color: #111;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.2);
+}
+
+.action-btn i {
+  font-size: 1.5rem;
+}
+
+
+
 </style>
 </head>
 <body>
+
   <!-- Ttiel -->
   <nav class="top-nav">
     <div class="nav-left">
       <a href="/" class="logo">MHS Student Council</a>
     </div>
-  </nav>  
+  </nav> 
 
-  <!-- Sidebar -->
+  <!-- ===== Sidebar ===== -->
   <aside class="sidebar">
-    <div class="sidebar-links">
-      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
-      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
-      <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
-      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
-      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
-      <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
-      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
-    </div>
-  
-    <div class="sidebar-footer">
-      <a href="login.html" class="admin-link"><i class="fas fa-user-circle"></i> <span>Admin</span></a>
-    </div>
+        <a href="index.html">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to site
+    </a>
+    
+    <a href="admin.html">
+      <i class="fas fa-gauge"></i>
+      Dashboard
+    </a>
+
+    <a href="admin-members.html">
+      <i class="fas fa-users"></i>
+      Manage Members
+    </a>
+
+    <a href="create-event.html">
+      <i class="fas fa-calendar-plus"></i>
+      Manage Events
+    </a>
+
+    <a href="service.html">
+      <i class="fas fa-clock"></i>
+      Service Hours
+    </a>
   </aside>
-  
-  <div class="spacer">
-  
-  <div class="container">
-    <h1>Admin Dashboard</h1>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h2 id="totalMembers">0</h2>
-        <p>Total Members</p>
-      </div>
-      <div class="stat-card">
-        <h2 id="totalHours">0</h2>
-        <p>Total Service Hours</p>
-      </div>
-      <div class="stat-card">
-        <h2 id="belowHours">0</h2>
-        <p>Members Below Hours</p>
-      </div>
-      <div class="stat-card">
-        <h2 id="upcomingEvents">0</h2>
-        <p>Upcoming Events</p>
-      </div>
-    </div>
+  <!-- ===== Main Content ===== -->
+  <main class="container">
+    <h1><i class="fas fa-gauge"></i> Admin Dashboard</h1>
+    <p>Quick access to member management, events, and service hour tracking.</p>
 
-    <!-- Quick Action Buttons -->
-    <div class="actions">
-      <a href="create-event.html" class="action-btn"><i class="fas fa-plus-circle"></i> Create Event</a>
-      <a href="service.html" class="action-btn"><i class="fas fa-stopwatch"></i> View Service Hours</a>
-      <a href="#" class="action-btn"><i class="fas fa-file-csv"></i> Export CSV</a>
-    </div>
+    <!-- Quick Action Cards -->
+    <section class="quick-actions">
 
-    <!-- Search -->
-    <input type="text" id="memberSearch" class="search-bar" placeholder="Search members..." />
+      <a href="admin-members.html" class="action-btn">
+        <i class="fas fa-users icon"></i>
+        <span>Manage Members</span>
+      </a>
 
-    <!-- Recent Activity Table -->
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Service Hours</th>
-          <th>Meeting Credit</th>
-          <th>Position</th>
-          <th>Last Event</th>
-        </tr>
-      </thead>
-      <tbody id="activityTable">
-        <!-- JS fills this -->
-      </tbody>
-    </table>
-  </div>
+      <a href="create-event.html" class="action-btn">
+        <i class="fas fa-calendar-plus icon"></i>
+        <span>Manage Events</span>
+      </a>
+
+      <a href="service.html" class="action-btn">
+        <i class="fas fa-clock icon"></i>
+        <span>Service Hours</span>
+      </a>
+      
+      <a href="https://google.com" class="action-btn">
+        <i class="fa-solid fa-hard-drive icon"></i>
+        <span>Exec Google Drive</span>
+      </a>
+
+    </section>
+
+    <div class="spacer"></div>
+
+    <!-- Optional summary section -->
+    <section>
+      <h2>Overview</h2>
+
+      <div class="directory-list">
+        <div class="directory-card">
+          <h3 id="totalMembers">0</h3>
+          <p class="role">Total Members</p>
+        </div>
+
+        <div class="directory-card">
+          <h3 id="totalHours">0</h3>
+          <p class="role">Total Service Hours</p>
+        </div>
+
+        <div class="directory-card">
+          <h3 id="upcomingEvents">0</h3>
+          <p class="role">Upcoming Events</p>
+        </div>
+      </div>
+    </section>
+    
+        <div class="spacer"></div>
+
+        <section>
+          <h2>Service Activities</h2>
+          <p>Service Activities & events DO NOT SYNC</p>
+<table id="service-hours-table">
+  <thead>
+    <tr>
+      <th>Event Name</th>
+      <th>Rough # of hours</th>
+      <th>Active?</th>
+      <th>Multiple Entries?</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<button id="save-btn">Save Changes</button>
+</section>
+
+  </main>
+
 
   <script>
     const sheetCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT9nsgWRuANHKqhFPeAWN88MvusJSzkQtcm4nUdaVIjAky1WifmSchquUEg0BV5r1dEvedKnKjtyiwC/pub?gid=0&single=true&output=csv";
@@ -190,5 +272,96 @@
 
     fetchAccounts();
   </script>
+  <script>
+    const SCRIPT_URL = 'http://localhost:3000/api/service-hours'; // must be Apps Script, not CSV
+
+    let tableData = [];
+
+    async function loadTable() {
+  const res = await fetch(SCRIPT_URL);
+  const data = await res.json();
+  tableData = data.table; // assuming your JSON has { table: [...] }
+
+  const tbody = document.querySelector('#service-hours-table tbody');
+  tbody.innerHTML = '';
+
+  data.table.forEach((row, i) => {
+    const tr = document.createElement('tr');
+    row.forEach((cell, j) => {
+      const td = document.createElement('td');
+
+      // For last 2 columns, render checkboxes
+      if (j >= row.length - 2) {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = cell === 'TRUE';
+        checkbox.addEventListener('change', () => {
+          tableData[i][j] = checkbox.checked ? 'TRUE' : 'FALSE';
+        });
+        td.appendChild(checkbox);
+      } else {
+        td.contentEditable = true;
+        td.textContent = cell;
+        td.addEventListener('input', () => {
+          tableData[i][j] = td.textContent;
+        });
+      }
+
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+// Save button
+document.getElementById('save-btn').addEventListener('click', async () => {
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ table: tableData })
+    });
+    const result = await res.json();
+    alert(JSON.stringify(result));
+  } catch(e) {
+    alert('Error saving: ' + e.message);
+  }
+});
+
+loadTable();
+
+
+  </script>
+    <script>
+async function showAdminMenu() {
+  try {
+    const res = await fetch('/api/userinfo');
+    if (!res.ok) return;
+
+    const user = await res.json();
+    console.log('USER INFO:', user);
+
+    if (user.role === 'exec_board') {
+      const adminSection = document.querySelector('.admin-links');
+      if (adminSection) {
+        adminSection.style.display = 'block';
+      }
+    }
+  } catch (err) {
+    console.error('Admin role check failed:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', showAdminMenu);
+
+           // Dropdown toggle
+document.querySelectorAll('.admin-dropdown .dropdown-toggle').forEach(toggle => {
+  toggle.addEventListener('click', e => {
+    e.preventDefault();
+    const dropdown = toggle.parentElement;
+    dropdown.classList.toggle('open');
+  });
+});
+    </script> 
 </body>
 </html>

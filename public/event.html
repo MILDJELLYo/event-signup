@@ -9,6 +9,82 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Modal Styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 24px;
+  font-weight: bold;
+  color: #666;
+  cursor: pointer;
+  background: none;
+  border: none;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.modal form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.modal form select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal button.danger {
+  background-color: #dc2626;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.modal button.danger:hover {
+  background-color: #b91c1c;
+}
+  </style>
 </head>
 <body>
   <!-- Ttiel -->
@@ -18,42 +94,110 @@
     </div>
   </nav>  
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-links">
-      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
-      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
-      <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
-      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
-      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
-      <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
-      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
-    </div>
-  
-    <div class="sidebar-footer">
-      <a href="login.html" class="admin-link"><i class="fas fa-user-circle"></i> <span>Admin</span></a>
-    </div>
-  </aside>
-
-  <div class="container" id="eventContainer">
-    <p style="color:#6b7280;">Loading event...</p>
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-links">
+    <!-- Member Links -->
+    <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
+    <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+      <!-- General Dropdown Template -->
+      <div class="sidebar-links dropdown-container">
+        <div class="admin-dropdown">
+          <a href="#" class="dropdown-toggle">
+            <i class="fas fa-folder"></i> <span>Events</span> 
+            <i class="fas fa-chevron-down dropdown-icon"></i>
+          </a>
+        <div class="dropdown-menu">
+          <a href="eventlist.html"><i class="fas fa-calendar"></i> Upcoming Events</a>
+          <a href="registered-events.html"><i class="fas fa-calendar-check"></i> Registered Events</a>
+          <a href="https://forms.gle/ju3RsR BJV86HkvSK8"><i class="fas fa-square-check"></i> Check-in</a>
+        </div>
+      </div>
+    <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
+    <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+          <!-- General Dropdown Template -->
+          <div class="sidebar-links dropdown-container">
+            <div class="admin-dropdown">
+              <a href="#" class="dropdown-toggle">
+                <i class="fas fa-address-book"></i> <span>Membership</span> 
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+              </a>
+            <div class="dropdown-menu">
+              <a href="leadership.html"><i class="fas fa-chart-project"></i> Leadership</a>
+              <a href="directory.html"><i class="fas fa-address-book"></i> Directory</a>
+              <a href="awards.html"><i class="fas fa-medal"></i> Awards</a>
+            </div>
+          </div>
+    <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
   </div>
 
-  <!-- Cancel Signup Modal -->
-  <div class="modal" id="cancelModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeCancelModal">&times;</span>
-      <h2>Cancel My Signup</h2>
-      <form id="cancelForm">
-        <label for="cancelSlot">Select Time Slot</label>
-        <select id="cancelSlot" required></select>
-        <label for="cancelName">Your Name</label>
-        <input type="text" id="cancelName" required />
-        <button type="submit" class="danger">Cancel Signup</button>
-      </form>
+  <!-- Admin Dropdown -->
+  <div class="sidebar-links admin-links" style="display:none;">
+    <div class="admin-dropdown">
+      <a href="#" class="dropdown-toggle">
+        <i class="fas fa-user-shield"></i> <span>Admin</span> <i class="fas fa-chevron-down dropdown-icon"></i>
+      </a>
+      <div class="dropdown-menu">
+        <a href="admin.html"><i class="fas fa-cogs"></i> Dashboard</a>
+        <a href="admin-members.html"><i class="fas fa-users-cog"></i> Manage Members</a>
+        <a href="create-event.html"><i class="fas fa-calendar-plus"></i> Manage Events</a>
+        <a href="service.html"><i class="fas fa-stopwatch"></i> Total Service Hours</a>
+      </div>
     </div>
   </div>
+</div>
+
+</aside>
+
+<!-- Main Content -->
+<div class="container">
+
+  <!-- Logged-in banner -->
+  <div id="userBanner" style="
+    background:#f1f5f9;
+    border:1px solid #e5e7eb;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:16px;
+    font-size:14px;
+    color:#334155;
+  ">
+    Signing up as <strong id="userEmail">loading…</strong>
+  </div>
+
+  <div style="font-size:13px; color:#64748b; margin-bottom:16px;">
+    Clicking “Sign Up” will automatically register your account.
+    If this is not the correct account, log out before registering.
+  </div>
+
+  <!-- Event content injected by JS -->
+  <div id="eventContainer">
+    <p style="color:#6b7280;">Loading event…</p>
+  </div>
+</div>
+
+<!-- Cancel Signup Modal -->
+<div class="modal" id="cancelModal">
+  <div class="modal-content">
+    <span class="close-btn" id="closeCancelModal">&times;</span>
+    <h2>Cancel My Signup</h2>
+
+    <form id="cancelForm">
+      <label for="cancelSlot">Select Time Slot</label>
+      <select id="cancelSlot" required></select>
+
+      <p style="font-size:13px; color:#6b7280; margin-top:8px;">
+        This will cancel the signup for your currently logged-in account.
+      </p>
+
+      <button type="submit" class="danger">Cancel Signup</button>
+    </form>
+  </div>
+</div>
 
   <script src="js/event.js"></script>
+  <script type="module" src="js/adminmenu.js"></script>
+  <script type="module" src="/js/auth-guard.js"></script>
+ 
 </body>
 </html>

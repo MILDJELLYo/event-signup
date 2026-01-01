@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MHS Student Council - Admin</title>
+  <title>MHS Student Council - Event Mangement</title>
   <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -103,6 +103,47 @@
       display: flex;
       justify-content: space-between;
     }
+
+    /* ===== Modals ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  animation: fadeIn 0.3s ease;
+}
+
+.close-btn {
+  float: right;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #9ca3af;
+}
+
+.close-btn:hover {
+  color: #b91c1c;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
   </style>
 </head>
 <body>
@@ -111,27 +152,38 @@
     <div class="nav-left">
       <a href="/" class="logo">MHS Student Council</a>
     </div>
-  </nav>  
+  </nav> 
 
-  <!-- Sidebar -->
+  <!-- ===== Sidebar ===== -->
   <aside class="sidebar">
-    <div class="sidebar-links">
-      <a href="index.html"><i class="fas fa-home"></i> <span>Member Home</span></a>
-      <a href="https://www.remind.com/classes/dd8b749f/"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
-      <a href="eventlist.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
-      <a href="committees.html"><i class="fas fa-users"></i> <span>Committees</span></a>
-      <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
-      <a href="directory.html"><i class="fas fa-address-book"></i> <span>Directory</span></a>
-      <a href="accounts.html"><i class="fas fa-stopwatch"></i> <span>Service Hours</span></a>
-    </div>
-  
-    <div class="sidebar-footer">
-      <a href="login.html" class="admin-link"><i class="fas fa-user-circle"></i> <span>Admin</span></a>
-    </div>
+        <a href="index.html">
+      <i class="fa-solid fa-arrow-left"></i>
+      Back to site
+    </a>
+    
+    <a href="admin.html">
+      <i class="fas fa-gauge"></i>
+      Dashboard
+    </a>
+
+    <a href="admin-members.html">
+      <i class="fas fa-users"></i>
+      Manage Members
+    </a>
+
+    <a href="create-event.html">
+      <i class="fas fa-calendar-plus"></i>
+      Manage Events
+    </a>
+
+    <a href="service.html">
+      <i class="fas fa-clock"></i>
+      Service Hours
+    </a>
   </aside>
 
   <div class="container">
-    <h1>Admin Dashboard</h1>
+    <h1><i class="fas fa-calendar-plus"></i> Event Management</h1>
     <button id="createBtn">+ Create New Event</button>
     <div id="eventsList"></div>
   </div>
@@ -233,5 +285,38 @@
   </div>
 
   <script src="js/admin.js"></script>
+  <script>
+async function showAdminMenu() {
+  try {
+    const res = await fetch('/api/userinfo');
+    if (!res.ok) return;
+
+    const user = await res.json();
+    console.log('USER INFO:', user);
+
+    if (user.role === 'exec_board') {
+      const adminSection = document.querySelector('.admin-links');
+      if (adminSection) {
+        adminSection.style.display = 'block';
+      }
+    }
+  } catch (err) {
+    console.error('Admin role check failed:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', showAdminMenu);
+
+         // Dropdown toggle
+document.querySelectorAll('.admin-dropdown .dropdown-toggle').forEach(toggle => {
+  toggle.addEventListener('click', e => {
+    e.preventDefault();
+    const dropdown = toggle.parentElement;
+    dropdown.classList.toggle('open');
+  });
+});
+  </script> 
+  <script type="module" src="/js/auth-guard.js"></script>
+
 </body>
 </html>

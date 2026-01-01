@@ -1,6 +1,23 @@
 const list = document.getElementById('eventsList');
 const dateScroll = document.getElementById('dateScroll');
 
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/login.html'); // redirect if not logged in
+  }
+  next();
+}
+
+// Helper function to parse date correctly (prevents timezone shift)
+function parseLocalDate(dateString) {
+  // If it's already a date object, return it
+  if (dateString instanceof Date) return dateString;
+  
+  // Parse as local date (YYYY-MM-DD format)
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 fetch('/api/events')
   .then(res => res.json())
   .then(events => {
@@ -12,20 +29,22 @@ fetch('/api/events')
     // Group events by date
     const eventsByDate = {};
     events.forEach(e => {
-      const dateObj = new Date(e.date);
+      const dateObj = parseLocalDate(e.date);
       const dateKey = dateObj.toDateString();
       if (!eventsByDate[dateKey]) eventsByDate[dateKey] = [];
       eventsByDate[dateKey].push(e);
     });
 
     // Determine month to display (use earliest event)
-    const firstEventDate = new Date(events[0].date);
+    const firstEventDate = parseLocalDate(events[0].date);
     const year = firstEventDate.getFullYear();
     const month = firstEventDate.getMonth(); // 0-based
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     // Today
-    const today = new Date().toDateString();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayKey = today.toDateString();
 
     // Create horizontal month calendar
     let todayButton = null;
@@ -38,7 +57,7 @@ fetch('/api/events')
       btn.innerHTML = `<span class="day-num">${day}</span><span class="weekday">${weekday}</span>`;
 
       // Highlight today
-      if (dateKey === today) {
+      if (dateKey === todayKey) {
         btn.classList.add('today');
         todayButton = btn;
       }
@@ -74,7 +93,7 @@ fetch('/api/events')
         const div = document.createElement('div');
         div.className = 'event-card';
 
-        const dateObj = new Date(e.date);
+        const dateObj = parseLocalDate(e.date);
         const monthShort = dateObj.toLocaleString('en-US', { month: 'short' });
         const dayNum = dateObj.getDate();
 
